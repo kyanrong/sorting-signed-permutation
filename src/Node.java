@@ -22,12 +22,24 @@ public class Node {
 		children = new ArrayList<Node>();
 	}
 	
+	public String getType() {
+		return type;
+	}
+	
+	public Component getComponent() {
+		return c;
+	}
+	
 	public void addChild(Node child) {
 		children.add(child);
 	}
 	
 	public void setParent(Node p) {
 		parent = p;
+	}
+	
+	public Node getParent() {
+		return parent;
 	}
 	
 	public ArrayList<Node> getChildren() {

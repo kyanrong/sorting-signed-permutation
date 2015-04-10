@@ -4,71 +4,67 @@ import java.util.Stack;
 
 
 public class P1 {
-	int[] s1, s2;
 	int seq_len;
-	String[] s1_signs, s2_signs; 
-	ArrayPair p1, p2;
+	ComponentPair p1, p2;
+	ArrayList<PermutationPair> permutations;			// all the permutations in the file
 	
 	public P1() {
+		permutations = new ArrayList<PermutationPair>(); 
+		
 		System.out.println("********************* P1 *********************");
 		System.out.println("Please input 2 sequences: ");
 		getInput();
 		
-		/*for(int i=0; i<s1.length; i++) {
-			System.out.println(s1[i] + ", " + s1Signs[i]);
-			
-		}*/
+		p1 = findComponents(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr());
+		p2 = findComponents(permutations.get(1).getPiArr(), permutations.get(1).getSigmaArr());
 		
-		p1 = findComponents(s1, s1_signs);
-		p2 = findComponents(s2, s2_signs);
 		constructTree(p1, seq_len);
-		constructTree(p2, seq_len);
+		//constructTree(p2, seq_len);
 	}
 	
 	private void getInput() {
 		Scanner sc = new Scanner(System.in);
-		for(int i=0; i<4; i++) {
-			String input = sc.nextLine();
-			if(i == 1) {
-				String[] seq = input.split(", ");
+		int i = 4;
+		while(i != 0) {
+			String line = sc.nextLine();
+			if(!line.startsWith(">")) {
+				String[] seq = line.split(", ");
 				seq_len = seq.length+2;				// +2 to add 0 and n+1 to the seq
-				s1 = new int[seq_len];			
-				s1_signs = new String[seq_len];
-				separate(seq, s1, s1_signs);
+				PermutationPair pp = separate(seq);
+				permutations.add(pp);
 			}
-			else if(i == 3) {
-				String[] seq = input.split(", ");
-				s2 = new int[seq.length+2];
-				s2_signs = new String[seq_len];
-				separate(seq, s2, s2_signs);
-			}
+			i--;
 		}
 		sc.close();
 	}
 	
 	// separate into unsigned elements and their signs
-	private void separate(String[] input, int[] s, String[] sign) {
-		for(int i=0; i<input.length; i++) {
-			int num = Integer.parseInt(input[i]);
-			if(num >= 0) {
-				s[i+1] = num;
-				sign[i+1] = "+";
+	private PermutationPair separate(String[] seq) {
+		int[] pi = new int[seq_len];
+		String[] sigma = new String[seq_len];
+		
+		for(int i=0; i<seq.length; i++) {
+			int num = Integer.parseInt(seq[i]);
+			if(num > 0) {
+				pi[i+1] = num;					
+				sigma[i+1] = "+";
 			}
 			else {
-				s[i+1] = num * -1;
-				sign[i+1] = "-";
+				pi[i+1] = num * -1;
+				sigma[i+1] = "-";
 			}
 		}
+				
+		pi[0] = 0; sigma[0] = "+";
+		pi[pi.length-1] = pi.length-1; sigma[sigma.length-1] = "+";				
 		
-		s[0] = 0; sign[0] = "+";
-		s[s.length-1] = s.length-1; sign[s.length-1] = "+";
+		return new PermutationPair(pi, sigma);
 	}
 	
 	// pi contains the unsigned elements
 	// sigma contains the signs
-	private ArrayPair findComponents(int[] pi, String[] sigma) {
-		ArrayList<Component> c = new ArrayList<Component>();
-		// for each index i, at most one component can start at pos i and at most one component can end at pos i
+	private ComponentPair findComponents(int[] pi, String[] sigma) {
+		// for each index i, at most one component can start at pos i and at most one component can end at pos i	
 		Component[] c_start = new Component[pi.length];
 		Component[] c_end = new Component[pi.length];
 		
@@ -94,10 +90,8 @@ public class P1 {
 			}
 			// Pop from M1 all entries that are smaller than pi[i]
 			else {
-				for(int j=M1.size()-1; j>-1; j--) {
-					if(M1.get(j) < pi[i]) {
-						M1.remove(j);
-					}
+				while(M1.peek() < pi[i]) {
+					M1.pop();
 				}
 			}
 			M[i] = M1.peek();
@@ -109,9 +103,9 @@ public class P1 {
 				s = S1.peek();
 			}
 			if(sigma[i].equals("+") && M[i]==M[s] && i-s==pi[i]-pi[s]) {
-				c.add(new Component(s, i));
-				c_start[s] = new Component(s, i);
-				c_end[i] = new Component(s, i);
+				boolean oriented = isOriented(s, i, pi, sigma);
+				c_start[s] = new Component(s, i, oriented);
+				c_end[i] = new Component(s, i, oriented);
 			}
 			
 			// Compute m[i]: the nearest element of pi that precedes pi(i) and is smaller than pi(i)
@@ -119,10 +113,8 @@ public class P1 {
 				M2.push(pi[i-1]);
 			}
 			else {
-				for(int j=M2.size()-1; j>-1; j--) {
-					if(M2.get(j) > pi[i]) {
-						M2.remove(j);
-					}
+				while(M2.peek() > pi[i]) {
+					M2.pop();
 				}
 			}
 			m[i] = M2.peek();
@@ -134,9 +126,9 @@ public class P1 {
 				t = S2.peek();
 			}
 			if(sigma[i].equals("-") && m[i]==m[t] && i-t==pi[t]-pi[i]) {
-				c.add(new Component(t, i));
-				c_start[t] = new Component(t, i);
-				c_end[i] = new Component(t, i);
+				boolean oriented = isOriented(t, i, pi, sigma);
+				c_start[t] = new Component(t, i, oriented);
+				c_end[i] = new Component(t, i, oriented);
 			}
 			
 			// Update stacks
@@ -153,15 +145,11 @@ public class P1 {
 			System.out.println(M1.get(j));
 		}*/
 		
-		/*System.out.println("Component list size = " + c.size());
-		for(int i=0; i<c.size(); i++) {
-			System.out.println(c.get(i).getStart() + ", " + c.get(i).getEnd());
-		}*/
 		
 		System.out.println("c_start size = " + c_start.length);
 		for(int i=0; i<c_start.length; i++) {
 			if(c_start[i] != null)
-				System.out.println(i + ", component: " + c_start[i].getStart() + "," + c_start[i].getEnd());
+				System.out.println(i + ", component: " + c_start[i].getStart() + "," + c_start[i].getEnd() + ", oriented: " + c_start[i].getOrientation());
 			else 
 				System.out.println(i + ", null");
 		}
@@ -169,18 +157,18 @@ public class P1 {
 		System.out.println("c_end size = " + c_end.length);
 		for(int i=0; i<c_end.length; i++) {
 			if(c_end[i] != null)	
-				System.out.println(i + ", component: " + c_end[i].getStart() + "," + c_end[i].getEnd());
+				System.out.println(i + ", component: " + c_end[i].getStart() + "," + c_end[i].getEnd()+ ", oriented: " + c_end[i].getOrientation());
 			else 
 				System.out.println(i + ", null");
 		}
 		System.out.println();
 		
-		ArrayPair pair = new ArrayPair(c_start, c_end);
+		ComponentPair pair = new ComponentPair(c_start, c_end);
 		
 		return pair;
 	}
 	
-	private void constructTree(ArrayPair pair, int n) {
+	private void constructTree(ComponentPair pair, int n) {
 		Component[] c_s = pair.getCStart();
 		Component[] c_e = pair.getCEnd();
 		
@@ -189,42 +177,117 @@ public class P1 {
 		Node q = root;
 		
 		root.addChild(p);
+		p.setParent(root);
 		
 		for(int i=1; i<n-1; i++) {
 			if(c_s[i] != null) {			// if there is a component starting at pos i
 				if(c_e[i] == null) {		// if there is no component starting at pos i
 					q = new Node("square");
 					p.addChild(q);
+					q.setParent(p);
 				}
 				p = new Node("round", c_s[i]);
-				q.addChild(p);	
-			}
-			else if(c_e[i] != null) {		// there is a component ending at pos i
-				q.setParent(p);
+				q.addChild(p);
 				p.setParent(q);
-			}
+			}		
+			else if(c_e[i] != null) {		// there is a component ending at pos i
+				p = q.getParent();
+				q = p.getParent();
+			}		
 		}
 		
 		Tree tree = new Tree(root);
 		
 		System.out.println("Tree size = " + tree.getTreeSize());
+		tree.printTree(root);
 		
-		/*for(int i=0; i<root.getChildrenSize(); i++) {
-			System.out.println(root.getChildren().get(i));
-		}*/
+		generateSubtree(tree);
 	}
 	
 	// Generate T': the smallest subtree of T that contains all unoriented components of P
-	// obtained by recursively removing from T all dangling oriented components and square nodes
+	// obtained by recursively removing from T all dangling oriented components and square nodes (post-order traversal)
 	// All leaves of T' will be unoriented components, while internal round nodes may still represent oriented components
-	private Tree generateTreeSubset() {
+	private void generateSubtree(Tree t) {
+		Node root = t.getRoot();
+		boolean result = remove(root);
+		Tree subtree = new Tree(root);
+
+		System.out.println("Subtree size = " + subtree.getTreeSize());
+		subtree.printTree(root);
 		
+	}
+	
+	private boolean remove(Node n) {
+		System.out.println("Its children are:");
+		for(int i=n.getChildrenSize()-1; i>=0; i--) {
+			if(n.getChildren().get(i).getComponent() == null) {
+				System.out.print("square ");
+			}
+			else {
+				System.out.print(n.getChildren().get(i).getComponent().getStart() + "," + n.getChildren().get(i).getComponent().getEnd() + " ");
+			}
+		}
+		System.out.println();
+		for(int i=0; i<n.getChildrenSize(); i++) {
+			if(n.getChildren().get(i).getComponent() == null) {
+				System.out.println("Calling remove on square");
+			}
+			else {
+				System.out.println("Calling remove on " + n.getChildren().get(i).getComponent().getStart() + "," + n.getChildren().get(i).getComponent().getEnd());
+			}
+			boolean valid = remove(n.getChildren().get(i));
+			if(!valid) {
+				if(n.getChildren().get(i).getComponent() == null) {
+					System.out.println("Removing square");
+				}
+				else {
+					System.out.println("Removing " + n.getChildren().get(i).getComponent().getStart() + "," + n.getChildren().get(i).getComponent().getEnd());
+				}
+				n.getChildren().remove(i);
+			}
+		}
+		
+		if(!n.hasChild()) {
+			if(n.getType().equals("square") || n.getComponent().getOrientation()==true) {
+				return false;
+			}
+		}
+		else {
+			return true;
+		}
+		
+		return true;
 	}
 	
 	// Find out if a component is oriented
 	// unoriented component: has one or more breakpoints, and (p,q) have the same sign
-	// oriented component: otherwise (no breakpoints, or have different sign)
-	private boolean isOriented() {
-		
+	// oriented component: otherwise 
+	private boolean isOriented(int start, int end, int[] pi, String[] sigma) {
+		if(hasBreakpoints(start, end, pi, sigma) && !hasDifferentSigns(start, end, sigma)) {
+			return false;
+		}
+		return true;
 	}
+	
+	private boolean hasBreakpoints(int start, int end, int[] pi, String[] sigma) {
+		for(int i=start; i<end-1; i++) {
+			int s = Integer.parseInt(sigma[i]+pi[i]);
+			int e = Integer.parseInt(sigma[i+1]+pi[i+1]);
+			if(e < s) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean hasDifferentSigns(int start, int end, String[] sigma) {
+		for(int i=start; i<end-1; i++) {
+			if(!sigma[i].equals(sigma[i+1])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+
 }

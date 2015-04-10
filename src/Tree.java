@@ -27,5 +27,17 @@ public class Tree {
 		
 		return nodes;
 	}
+	
+	public void printTree(Node n) {
+		if(n.getComponent()==null) {
+			System.out.println("parent: " + n.getType() + ". Its children are: ");
+		}
+		else {
+			System.out.println("	component= " + n.getComponent().getStart() + "," + n.getComponent().getEnd() + " oriented=" + n.getComponent().getOrientation());
+		}
+		for(Node child : n.getChildren()) {
+			printTree(child);
+		}
+	}
 
 }
