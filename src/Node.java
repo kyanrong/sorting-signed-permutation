@@ -7,12 +7,14 @@ public class Node {
 	private Component c;	
 	private Node parent;
 	private ArrayList<Node> children;
+	private boolean visited;
 	
 	public Node(String t, Component c) {
 		type = t;
 		this.c = c;
 		parent = null;
 		children = new ArrayList<Node>();
+		visited = false;
 	}
 	
 	public Node(String t) {
@@ -20,6 +22,7 @@ public class Node {
 		c = null;
 		parent = null;
 		children = new ArrayList<Node>();
+		visited = false;
 	}
 	
 	public String getType() {
@@ -30,12 +33,20 @@ public class Node {
 		return c;
 	}
 	
+	public boolean getVisited() {
+		return visited;
+	}
+	
 	public void addChild(Node child) {
 		children.add(child);
 	}
 	
 	public void setParent(Node p) {
 		parent = p;
+	}
+	
+	public void setVisited(boolean v) {
+		visited = v;
 	}
 	
 	public Node getParent() {
