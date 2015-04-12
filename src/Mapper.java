@@ -13,6 +13,7 @@ public class Mapper {
 	private int[] newA_Unsigned;
 	private boolean[] newA_signs;
 	
+	
 	private ArrayList<Integer> newStartUnsigned = new ArrayList<Integer>();
 	private ArrayList<Boolean> newStartSigns = new ArrayList<Boolean>();
 	
@@ -93,6 +94,28 @@ public class Mapper {
 	public ArrayList<Boolean> getNewStartSign() {
 		return newStartSigns;
 	}
+	public ArrayList<Integer> getCurrentReversal(ArrayList<Integer> al,ArrayList<Boolean> signs ) {
+		ArrayList<Integer> ans = new ArrayList<Integer>(); 
+		for(int i = 0; i < al.size();i++) {
+			//if signConvert is positive
+			if(signConvert[al.get(i)]) {
+				//retain sign
+				if(signs.get(i))
+					ans.add(oriB_Unsigned.get(al.get(i)));
+				else
+					ans.add(oriB_Unsigned.get(al.get(i))*-1);
+			}
+			else {
+				if(signs.get(i)) 
+					ans.add(oriB_Unsigned.get(al.get(i))*-1);
+				else
+					ans.add(oriB_Unsigned.get(al.get(i)));
+						
+				}
+			
+		}
+		return ans;
+	}
 	
 	public static void main(String[] args) {
 		ArrayList<Integer> start = new ArrayList<Integer>() ;
@@ -141,12 +164,15 @@ public class Mapper {
 		System.out.println();
 		System.out.println("The line below is the signs of the new function");
 		for(int j = 0; j<test2.size();j++) {
-			
 			System.out.print(test2.get(j)+"|");
-			
-			
 		}
+		System.out.println();
+		ArrayList<Boolean> test3 = mup.getNewStartSign();
+		ArrayList<Integer> test4 = mup.getCurrentReversal(test,test3);
 		
+		for(int j = 0; j<test4.size();j++) {
+			System.out.print(test4.get(j)+"|");
+		}
 	}
 	
 	
