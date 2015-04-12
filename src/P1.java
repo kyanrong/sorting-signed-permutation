@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -21,6 +22,8 @@ public class P1 {
 		
 		Node subtreeRoot = constructTree(p1, seq_len);
 		ArrayList<Path> cover = findCover(subtreeRoot);
+		orientComponents(cover, permutations.get(0));
+		
 		//constructTree(p2, seq_len);
 	}
 	
@@ -345,23 +348,42 @@ public class P1 {
 
 	
 	// apply merge/cut on the cover to orient all components
-	private void orientComponents(ArrayList<Path> cover) {
+	private void orientComponents(ArrayList<Path> cover, PermutationPair pp) {
 		for(int i=0; i<cover.size(); i++) {
 			if(cover.get(i).getSize() == 1) {
-				cut(cover.get(i).getStartComponent());
+				cut(cover.get(i).getStartComponent(), pp);
+			}
+			else {
+				merge(cover.get(i).getStartComponent(), cover.get(i).getEndComponent(), pp);
 			}
 		}
 	}
-	
-	// TODO
-	private void cut(Component c) {
+
+	private void cut(Component c, PermutationPair pp) {
 		int startidx = c.getStart();
 		int endidx = c.getEnd();
+		ArrayList<Integer> pi = pp.getPiArr();
+		ArrayList<Boolean> sigma = pp.getSigmaArr();
 		
+		Collections.reverse(pi.subList(startidx, endidx+1));
+		for(int i=startidx; i<endidx+1; i++) {
+			sigma.set(i, !sigma.get(i));
+		}
+		Collections.reverse(sigma.subList(startidx, endidx+1));
 	}
 	
-	// TODO 
-	private void merge() {
+	// c1 and c2 are in order, so c1's startidx will always be smallest
+	private void merge(Component c1, Component c2, PermutationPair pp) {
+		int startidx = c1.getStart();
+		int endidx = c2.getEnd();
+		ArrayList<Integer> pi = pp.getPiArr();
+		ArrayList<Boolean> sigma = pp.getSigmaArr();
+		
+		Collections.reverse(pi.subList(startidx, endidx+1));
+		for(int i=startidx; i<endidx+1; i++) {
+			sigma.set(i,  !sigma.get(i));
+		}
+		Collections.reverse(sigma.subList(startidx, endidx+1));
 		
 	}
 }
