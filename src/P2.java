@@ -241,6 +241,7 @@ public class P2 {
 		return subtreeRoot;
 	}
 	
+	
 	// Generate T': the smallest subtree of T that contains all unoriented components of P
 	// obtained by recursively removing from T all dangling oriented components and square nodes (post-order traversal)
 	// All leaves of T' will be unoriented components, while internal round nodes may still represent oriented components

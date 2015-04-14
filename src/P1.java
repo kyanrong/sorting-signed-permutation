@@ -233,6 +233,8 @@ public class P1 {
 		//System.out.println("Subtree size = " + subtree.getTreeSize());
 		//subtree.printTree(root);
 		
+		//System.out.println("Subtree leaves count = " + subtree.getLeavesCount());
+		
 		return root;		
 	}
 	
@@ -312,11 +314,10 @@ public class P1 {
 	
 	// input the root node of T'(only has all unoriented components)
 	private ArrayList<Path> findCover(Node n) {
-		int count = 0;
 		ArrayList<Path> cover = new ArrayList<Path>();
 		ArrayList<Component> list = new ArrayList<Component>();
 		
-		list = visit(n, count, cover, list);
+		list = visit(n, cover, list);
 		cover.add(new Path(list.get(0)));
 		
 		System.out.println("Cover size = " + cover.size());
@@ -332,9 +333,9 @@ public class P1 {
 		return cover;
 	}
 	
-	private ArrayList<Component> visit(Node n, int count, ArrayList<Path> cover, ArrayList<Component> list) {
+	private ArrayList<Component> visit(Node n, ArrayList<Path> cover, ArrayList<Component> list) {
 		for(int i=0; i<n.getChildrenSize(); i++) {
-			visit(n.getChildren().get(i), count, cover, list);
+			visit(n.getChildren().get(i), cover, list);
 		}
 		// leaves are confirmed to be unoriented
 		if(!n.hasChild() && !n.getVisited() && list.isEmpty()) {

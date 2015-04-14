@@ -67,4 +67,14 @@ public class Node {
 		}
 		return false;
 	}
+	
+	public int getDegree() {
+		int degree = 0;
+		if(getParent() != null) {
+			degree += 1;
+		}
+		degree += getChildrenSize();
+		
+		return degree;
+	}
 }

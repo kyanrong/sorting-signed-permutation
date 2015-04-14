@@ -46,5 +46,22 @@ public class Tree {
 		}
 		System.out.println();
 	}
+	
+	public int getLeavesCount() {
+		return visit(root, 0);
+	}
+	
+	private int visit(Node n, int count) {
+		if(!n.hasChild()) {
+			System.out.println("return 1");
+			return count+1;
+		}
+		for(Node child : n.getChildren()) {
+			count = visit(child, count);
+		}
+	
+		return count;
+
+	}
 
 }
