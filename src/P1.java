@@ -30,12 +30,16 @@ public class P1 {
 	private void getInput() {
 		Scanner sc = new Scanner(System.in);
 		int i = 4;
+		String name = null;
 		while(i != 0) {
 			String line = sc.nextLine();
-			if(!line.startsWith(">")) {
+			if(line.startsWith(">")) {
+				name = line.split("> ")[1];
+			}
+			else {
 				String[] seq = line.split(", ");
 				seq_len = seq.length+2;				// +2 to add 0 and n+1 to the seq
-				PermutationPair pp = separate(seq);
+				PermutationPair pp = separate(seq, name);
 				permutations.add(pp);
 			}
 			i--;
@@ -44,7 +48,7 @@ public class P1 {
 	}
 	
 	// separate into unsigned elements and their signs
-	private PermutationPair separate(String[] seq) {
+	private PermutationPair separate(String[] seq, String name) {
 		ArrayList<Integer> pi = new ArrayList<Integer>();
 		ArrayList<Boolean> sigma = new ArrayList<Boolean>();
 		
@@ -64,7 +68,7 @@ public class P1 {
 				
 		pi.add(seq_len-1); sigma.add(true);
 		
-		return new PermutationPair(pi, sigma);
+		return new PermutationPair(pi, sigma, name);
 	}
 	
 	// pi contains the unsigned elements
