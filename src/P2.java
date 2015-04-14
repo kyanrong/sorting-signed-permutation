@@ -20,9 +20,9 @@ public class P2 {
 		
 		permutations = new ArrayList<PermutationPair>();
 		componentPairs = new ArrayList<ComponentPair>();
-		dist = new int[permutations.size()][permutations.size()];
 
 		getInput();
+		//dist = new int[permutations.size()][permutations.size()];
 		getComponents();
 		getTrees();
 	}
@@ -31,6 +31,7 @@ public class P2 {
 		Scanner sc = new Scanner(System.in);
 		//String path = sc.nextLine();
 		String path = "datasets/viral_genome.txt";
+		
 		
 		FileReader fr = new FileReader(new File(path));
 		BufferedReader br = new BufferedReader(fr);
@@ -81,7 +82,7 @@ public class P2 {
 			}
 		}
 				
-		pi.add(seq.length-1); sigma.add(true);			
+		pi.add(seq_len-1); sigma.add(true);
 		
 		return new PermutationPair(pi, sigma);
 	}
@@ -92,6 +93,11 @@ public class P2 {
 		// for each index i, at most one component can start at pos i and at most one component can end at pos i	
 		ArrayList<Component> c_start = new ArrayList<Component>();
 		ArrayList<Component> c_end = new ArrayList<Component>();
+		
+		for(int i=0; i<pi.size(); i++) {
+			c_start.add(null);
+			c_end.add(null);
+		}
 		
 		Stack<Integer> M1 = new Stack<Integer>();
 		Stack<Integer> M2 = new Stack<Integer>();
@@ -115,7 +121,7 @@ public class P2 {
 			}
 			// Pop from M1 all entries that are smaller than pi[i]
 			else {
-				while(M1.peek() < pi.get(i-1)) {
+				while(M1.peek() < pi.get(i)) {
 					M1.pop();
 				}
 			}
@@ -127,10 +133,10 @@ public class P2 {
 				S1.pop();
 				s = S1.peek();
 			}
-			if(sigma.get(i).equals("+") && M[i]==M[s] && i-s==pi.get(i)-pi.get(s)) {
+			if(sigma.get(i)==true && M[i]==M[s] && i-s==pi.get(i)-pi.get(s)) {
 				boolean oriented = isOriented(s, i, pi, sigma);
-				c_start.add(s, new Component(s, i, oriented));
-				c_end.add(i, new Component(s, i, oriented));
+				c_start.set(s, new Component(s, i, oriented));
+				c_end.set(i, new Component(s, i, oriented));
 			}
 			
 			// Compute m[i]: the nearest element of pi that precedes pi(i) and is smaller than pi(i)
@@ -150,14 +156,14 @@ public class P2 {
 				S2.pop();
 				t = S2.peek();
 			}
-			if(sigma.get(i).equals("-") && m[i]==m[t] && i-t==pi.get(t)-pi.get(i)) {
+			if(sigma.get(i)==false && m[i]==m[t] && i-t==pi.get(t)-pi.get(i)) {
 				boolean oriented = isOriented(t, i, pi, sigma);
-				c_start.add(t, new Component(t, i, oriented));
-				c_end.add(i, new Component(t, i, oriented));
+				c_start.set(t, new Component(t, i, oriented));
+				c_end.set(i, new Component(t, i, oriented));
 			}
 			
 			// Update stacks
-			if(sigma.get(i)) {
+			if(sigma.get(i)==true) {
 				S1.push(i);
 			}
 			else {
@@ -171,19 +177,19 @@ public class P2 {
 		}*/
 		
 		
-		/*System.out.println("c_start size = " + c_start.length);
-		for(int i=0; i<c_start.length; i++) {
-			if(c_start[i] != null)
-				System.out.println(i + ", component: " + c_start[i].getStart() + "," + c_start[i].getEnd() + ", oriented: " + c_start[i].getOrientation());
+		/*System.out.println("c_start size = " + c_start.size());
+		for(int i=0; i<c_start.size(); i++) {
+			if(c_start.get(i) != null)
+				System.out.println(i + ", component: " + c_start.get(i).getStart() + "," + c_start.get(i).getEnd() + ", oriented: " + c_start.get(i).getOrientation());
 			else 
 				System.out.println(i + ", null");
 		}
 		System.out.println();
 		
-		System.out.println("c_end size = " + c_end.length);
-		for(int i=0; i<c_end.length; i++) {
-			if(c_end[i] != null)	
-				System.out.println(i + ", component: " + c_end[i].getStart() + "," + c_end[i].getEnd()+ ", oriented: " + c_end[i].getOrientation());
+		System.out.println("c_end size = " + c_end.size());
+		for(int i=0; i<c_end.size(); i++) {
+			if(c_end.get(i) != null)	
+				System.out.println(i + ", component: " + c_end.get(i).getStart() + "," + c_end.get(i).getEnd()+ ", oriented: " + c_end.get(i).getOrientation());
 			else 
 				System.out.println(i + ", null");
 		}
@@ -299,9 +305,10 @@ public class P2 {
 	
 	private boolean hasBreakpoints(int start, int end, ArrayList<Integer> pi, ArrayList<Boolean> sigma) {
 		for(int i=start; i<end-1; i++) {
-		
-			int s = Integer.parseInt(sigma.get(i)?"+":"-"+pi.get(i));
-			int e = Integer.parseInt(sigma.get(i)?"+":"-"+pi.get(i+1));
+			String ss = sigma.get(i) ? "+" : "-";
+			String es = sigma.get(i+1) ? "+" : "-";
+			int s = Integer.parseInt(ss+pi.get(i));
+			int e = Integer.parseInt(es+pi.get(i+1));
 			if(e < s) {
 				return true;
 			}
@@ -311,7 +318,7 @@ public class P2 {
 	
 	private boolean hasDifferentSigns(int start, int end, ArrayList<Boolean> sigma) {
 		for(int i=start; i<end-1; i++) {
-			if(!sigma.get(i).equals(sigma.get(i+1))) {
+			if(sigma.get(i) != (sigma.get(i+1))) {
 				return true;
 			}
 		}
