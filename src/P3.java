@@ -1,7 +1,8 @@
 import java.util.*;
 import java.lang.*;
+import java.io.*;
 
-class phylo{
+class P3{
 	public static ArrayList<ArrayList<Integer>> matrix = new ArrayList<ArrayList<Integer>>();  //store the distance matrix
 	public static ArrayList<IntegerPair> min = new ArrayList<IntegerPair>();   //store the index of minimum distance for each row in the matrix
 	public static HashMap<String,Integer> SpeciesA =new HashMap<String,Integer>(); //key is the name
@@ -14,7 +15,11 @@ class phylo{
 		Scanner sc = new Scanner(System.in);
 		
 		//GET THE INPUT
-		getInput(sc);
+		try{
+			getInput();
+		}catch(IOException e){
+
+		}
 		
 		CNode root= new CNode();
 	
@@ -70,8 +75,70 @@ class phylo{
 }
 
 
+	private static void getInput() throws IOException {
+		Scanner sc = new Scanner(System.in);
+		String path = sc.nextLine();
+		//String path = "datasets/viral_genome.txt";
+		;
+		
+		FileReader fr = new FileReader(new File(path));
+		BufferedReader br = new BufferedReader(fr);
+		
+		String line;
+		String name = null;
+		int num = 0;
+		int minRow = 10000;
+		int rowIndex = 0;
+		int colIndex = 0;
+		int count = 0;
+		while((line=br.readLine())!= null) {
+			String[] scores = line.split("\\s+");
+			name = scores[0].substring(0,scores[0].length()-1);
+			
+			SpeciesA.put(name,count);
+			SpeciesB.put(count,name);
+
+
+			CNode newNode = new CNode(null,"leaf",name);
+			ArrayList<String> dummy = new ArrayList<String>();
+			cluster clusterNew = new cluster(count,dummy,newNode);
+			clusters.add(clusterNew);
+			ArrayList<Integer> row = new ArrayList<Integer>();
+			minRow=10000000;
+
+			for(int x=1;x<scores.length;x++){
+				String temp = scores[x].trim();
+				 
+				 if(x!=scores.length-1){
+				 temp = temp.substring(0,scores[x].length()-1);
+				 }
+				num = Integer.parseInt(temp);
+				System.out.println("num is " +num);
+				if(num < minRow && count!=x-1){
+					minRow = num;
+					rowIndex=count;
+					colIndex=x-1;
+				}
+				row.add(num);	
+
+			}
+
+		IntegerPair values = new IntegerPair(rowIndex,colIndex,minRow);
+		boolean check = min.add(values);
+		matrix.add(row);		
+		count++;		
+			
+		}
+		numNodes = count;
+		
+		br.close();
+		sc.close();
+	}
+
+
+
 	//Method to obtain input
-	private static void getInput(Scanner sc){
+	/*private static void getInput(Scanner sc){
 		
 		numNodes = sc.nextInt();
 		String name ="";
@@ -112,7 +179,7 @@ class phylo{
 		}
 		
 			
-	}
+	} */
 	
 	
 	//Method to obtain the minimum pairwise distance from minValues matrix
