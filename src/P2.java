@@ -28,6 +28,8 @@ public class P2 {
 		getComponents();
 		getSubtrees();
 		getCoverCosts();
+		
+		findIntervals(permutations.get(0));
 	}
 	
 	private void getInput() throws IOException {
@@ -74,7 +76,7 @@ public class P2 {
 	private void getCoverCosts() {
 		for(int i=0; i<permutations.size(); i++) {
 			int cost = findCoverCost(subtrees.get(i));
-			System.out.println(cost);
+			//System.out.println(cost);
 		}
 	}
 	
@@ -263,8 +265,8 @@ public class P2 {
 		Tree subtree = new Tree(root);
 		//cleanup(root);
 		
-		System.out.println("Subtree size = " + subtree.getTreeSize());
-		subtree.printTree(root);
+		//System.out.println("Subtree size = " + subtree.getTreeSize());
+		//subtree.printTree(root);
 		
 		return subtree;		
 	}
@@ -355,6 +357,40 @@ public class P2 {
 		}
 		else {
 			return leavesCount;
+		}
+	}
+	
+	// right point of k if k is +ve, otherwise its left point
+	// left point of k+1 if k+1 is +ve, else its right point
+	private void findIntervals(PermutationPair pp) {
+		ArrayList<Integer> pi = pp.getPiArr();
+		ArrayList<Boolean> sigma = pp.getSigmaArr();
+		int[][] intervals = new int[pi.size()-1][pi.size()-1]; 
+		
+		for(int i=0; i<pi.size()-1; i++) {
+			int idx1 = pi.indexOf(i);
+			int idx2 = pi.indexOf(i+1);
+			
+			if(sigma.get(idx1)) {
+				intervals[i][idx1] = 1;
+			}
+			else {
+				intervals[i][idx1-1] = 1;
+			}
+			
+			if(sigma.get(idx2)) {
+				intervals[i][idx2-1] = 1;
+			}
+			else {
+				intervals[i][idx2] = 1;
+			}
+		}
+		
+		for(int i=0; i<pi.size()-1; i++) {
+			for(int j=0; j<pi.size()-1; j++) {
+				System.out.print(intervals[i][j] + ", ");
+			}
+			System.out.println();
 		}
 	}
 
