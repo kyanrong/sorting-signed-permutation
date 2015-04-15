@@ -427,24 +427,30 @@ public class P1 {
 	
 	private PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma){
 		PermutationPair idseq = null;
-		ArrayList<Boolean> sign = null;
+		ArrayList<Boolean> sign = new ArrayList<Boolean>();
+		String name = null;
 		ArrayList<Integer> ppi = new ArrayList<Integer>();
 		ArrayList<Boolean> sig = new ArrayList<Boolean>();
-		PermutationPair seq = new PermutationPair (pi, sigma);
-		for (int i = 1; i<pi.size(); i++){
+		PermutationPair seq = new PermutationPair (pi, sigma, name);
+		for (int i = 0; i<pi.size(); i++){
 			ppi.add(i, i);
 			sig.add(i, true);
 		}
-		idseq = new PermutationPair (ppi, sig);
-
+		idseq = new PermutationPair (ppi, sig, name);
+		/*System.out.println(idseq.getPiArr());
+		System.out.println(idseq.getSigmaArr());
+		System.out.println(seq.getPiArr());
+		System.out.println(seq.getSigmaArr());*/
 		int index=-1;
 		int l = -1; int s = 0;
-		while (seq != idseq){
-			for (int j = 0; j <= pi.size()-1; j++){
-				sign.set(j, sigma.get(j));
+		while (seq.getPiArr() != idseq.getPiArr() && seq.getSigmaArr() != idseq.getSigmaArr()){
+			for (int j = 0; j <= sigma.size()-1; j++){
+				sign.add(sigma.get(j));
 			}
+			System.out.println(sign);
 			for (int k = 0; k <= pi.size()-1; k++){
 				index = pi.indexOf(k);
+				System.out.println("index: "+index);
 				if(sign.get(k) != sign.get(k+1) && pi.get(k+1) - pi.get(k) != 1){
 					int t = score(reversal(index, pi, sign));
 					if(t>s){
@@ -456,13 +462,17 @@ public class P1 {
 		}
 		PermutationPair permutation = reversal(l,pi,sign);
 		//call mapper
-		
+		for (int a = 1; a <= pi.size()-3; a++){
+		System.out.print(permutation.getSigmaArr().get(a).toString() +  permutation.getPiArr().get(a).toString()+", ");
+		}
+		System.out.println(permutation.getSigmaArr().get(pi.size()-2).toString()+ permutation.getPiArr().get(pi.size()-2).toString());
 		return permutation;
 	}
 
 	private PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign) {
-		PermutationPair permutation = new PermutationPair (pi, sign);
-		for (int i = 0; i <= pi.size()-1; i++){
+		String name = null;
+		PermutationPair permutation = new PermutationPair (pi, sign, name);
+		for (int i = 1; i <= pi.size()-2; i++){
 			int n_index = pi.indexOf(i+1);
 			int st = -1;
 			int en = -1;
@@ -474,6 +484,7 @@ public class P1 {
 				en = index;
 			}
 			int revLen = (en - st + 1)/2;
+			System.out.println("len: " + revLen);
 			if (sign.get(st) != sign.get(en)){
 				if (sign.get(st) == true){
 					if(sign.get(en) == false){
