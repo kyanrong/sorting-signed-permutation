@@ -49,7 +49,7 @@ public class Tree {
 	}
 	
 	private int visitLeaves(Node n, int count) {
-		if(!n.hasChild()) {
+		if(!n.getType().equals("square") && !n.hasChild()) {
 			return count+1;
 		}
 		for(Node child : n.getChildren()) {
@@ -93,50 +93,6 @@ public class Tree {
 		}
 		
 		return count;
-		
-		/*for(Node child : n.getChildren()) {
-			if(breakRecursion) {
-				System.out.println("here");
-				return true;
-			}
-			hasShortBranchAuxiliary(child);
-		}
-		if(n.getType().equals("square") && n.getDegree()>=3) {
-			System.out.println(visitLeaves(n, 0));
-			if(visitLeaves(n, 0) == 1) {
-				System.out.println("here");
-				breakRecursion = true;
-			}
-		}
-		return false;*/
-		
-		/*if(n.getComponent()!=null && !n.getComponent().getOrientation()) {
-			System.out.println("here");
-			list.add(n);
-		}
-		if(n.getType().equals("square") && n.getDegree()>=3) {
-			System.out.println("here square");
-			if(list.size() == 1) {
-				System.out.println("here list size 1");
-				breakRecursion = true;
-			}
-			else {
-				list.clear();
-			}
-		}
-
-		for(Node child: n.getChildren()) {
-			if(breakRecursion) {
-				System.out.println("break recursion");
-				return true;
-			}
-			else {
-				hasShortBranchAuxiliary(child, list);
-			}
-			
-		}
-		System.out.println("return false");
-		return true;*/
 		
 	}
 }

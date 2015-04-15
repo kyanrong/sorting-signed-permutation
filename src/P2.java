@@ -245,8 +245,8 @@ public class P2 {
 		
 		Tree tree = new Tree(root);
 		
-		System.out.println("Tree size = " + tree.getTreeSize());
-		tree.printTree(root);
+		//System.out.println("Tree size = " + tree.getTreeSize());
+		//tree.printTree(root);
 		
 		Tree subtree = generateSubtree(tree);
 		return subtree;
@@ -306,8 +306,6 @@ public class P2 {
 				return true;
 			}
 		}
-		
-		
 		return true;
 	}
 	
@@ -347,6 +345,10 @@ public class P2 {
 	// Calculated using Theorem 3, page 395 of the paper
 	private int findCoverCost(Tree tree) {
 		int leavesCount = tree.getLeavesCount();
+
+		if(leavesCount == 0) {
+			return 0;
+		}
 		
 		if(!tree.hasShortBranch()) {
 			return leavesCount+1;
