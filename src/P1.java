@@ -26,7 +26,7 @@ public class P1 {
 		orientComponents(cover, permutations.get(0));
 		findCoverCost(subtree);
 		//constructTree(p2, seq_len);
-		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr());
+		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr(), permutations.get(0).getName());
 	}
 	
 	private void getInput() {
@@ -231,8 +231,8 @@ public class P1 {
 		boolean result = remove(root);
 		Tree subtree = new Tree(root);
 
-		//System.out.println("Subtree size = " + subtree.getTreeSize());
-		//subtree.printTree(root);
+		System.out.println("Subtree size = " + subtree.getTreeSize());
+		subtree.printTree(root);
 		
 		//System.out.println("Subtree leaves count = " + subtree.getLeavesCount());
 		
@@ -272,10 +272,11 @@ public class P1 {
 			if(n.getType().equals("square") || n.getComponent().getOrientation()==true) {
 				return false;
 			}
+			else {
+				return true;
+			}
 		}
-		else {
-			return true;
-		}
+		
 		
 		return true;
 	}
@@ -425,17 +426,17 @@ public class P1 {
 	}
 
 	
-	private PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma){
+	private PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma, String name){
 		PermutationPair idseq = null;
 		ArrayList<Boolean> sign = null;
 		ArrayList<Integer> ppi = new ArrayList<Integer>();
 		ArrayList<Boolean> sig = new ArrayList<Boolean>();
-		PermutationPair seq = new PermutationPair (pi, sigma);
+		PermutationPair seq = new PermutationPair (pi, sigma, name);
 		for (int i = 1; i<pi.size(); i++){
 			ppi.add(i, i);
 			sig.add(i, true);
 		}
-		idseq = new PermutationPair (ppi, sig);
+		idseq = new PermutationPair (ppi, sig, name);
 
 		int index=-1;
 		int l = -1; int s = 0;
@@ -446,7 +447,7 @@ public class P1 {
 			for (int k = 0; k <= pi.size()-1; k++){
 				index = pi.indexOf(k);
 				if(sign.get(k) != sign.get(k+1) && pi.get(k+1) - pi.get(k) != 1){
-					int t = score(reversal(index, pi, sign));
+					int t = score(reversal(index, pi, sign, name));
 					if(t>s){
 						l = k;
 						s = t;
@@ -454,14 +455,14 @@ public class P1 {
 				}
 			}
 		}
-		PermutationPair permutation = reversal(l,pi,sign);
+		PermutationPair permutation = reversal(l,pi,sign, name);
 		//call mapper
 		
 		return permutation;
 	}
 
-	private PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign) {
-		PermutationPair permutation = new PermutationPair (pi, sign);
+	private PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign, String name) {
+		PermutationPair permutation = new PermutationPair (pi, sign, name);
 		for (int i = 0; i <= pi.size()-1; i++){
 			int n_index = pi.indexOf(i+1);
 			int st = -1;

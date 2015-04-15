@@ -12,6 +12,7 @@ public class P2 {
 	int seq_len;
 	ArrayList<PermutationPair> permutations;			// all the permutations in the file
 	ArrayList<ComponentPair> componentPairs;
+	ArrayList<Tree> subtrees;
 	int[][] dist;			
 
 	public P2() throws IOException {
@@ -20,17 +21,19 @@ public class P2 {
 		
 		permutations = new ArrayList<PermutationPair>();
 		componentPairs = new ArrayList<ComponentPair>();
+		subtrees = new ArrayList<Tree>();
 
 		getInput();
 		//dist = new int[permutations.size()][permutations.size()];
 		getComponents();
-		getTrees();
+		getSubtrees();
+		getCoverCosts();
 	}
 	
 	private void getInput() throws IOException {
 		Scanner sc = new Scanner(System.in);
 		//String path = sc.nextLine();
-		String path = "datasets/viral_genome.txt";
+		String path = "datasets/eg2.txt";
 		
 		
 		FileReader fr = new FileReader(new File(path));
@@ -61,9 +64,17 @@ public class P2 {
 		}
 	}
 	
-	private void getTrees() {
+	private void getSubtrees() {
 		for(int i=0; i<componentPairs.size(); i++) {
-			constructTree(componentPairs.get(i), seq_len);
+			Tree t = constructTree(componentPairs.get(i), seq_len);
+			subtrees.add(t);
+		}
+	}
+	
+	private void getCoverCosts() {
+		for(int i=0; i<permutations.size(); i++) {
+			int cost = findCoverCost(subtrees.get(i));
+			System.out.println(cost);
 		}
 	}
 	
@@ -204,7 +215,7 @@ public class P2 {
 		return pair;
 	}
 	
-	private Node constructTree(ComponentPair pair, int n) {
+	private Tree constructTree(ComponentPair pair, int n) {
 		ArrayList<Component> c_s = pair.getCStart();
 		ArrayList<Component> c_e = pair.getCEnd();
 		
@@ -234,27 +245,28 @@ public class P2 {
 		
 		Tree tree = new Tree(root);
 		
-		//System.out.println("Tree size = " + tree.getTreeSize());
-		//tree.printTree(root);
+		System.out.println("Tree size = " + tree.getTreeSize());
+		tree.printTree(root);
 		
-		Node subtreeRoot = generateSubtree(tree);
-		return subtreeRoot;
+		Tree subtree = generateSubtree(tree);
+		return subtree;
 	}
 	
 	
 	// Generate T': the smallest subtree of T that contains all unoriented components of P
 	// obtained by recursively removing from T all dangling oriented components and square nodes (post-order traversal)
 	// All leaves of T' will be unoriented components, while internal round nodes may still represent oriented components
-	private Node generateSubtree(Tree t) {
+	private Tree generateSubtree(Tree t) {
 		//System.out.println("Generating subtree ...");
 		Node root = t.getRoot();
-		boolean result = remove(root);
+		remove(root);
 		Tree subtree = new Tree(root);
-
-		//System.out.println("Subtree size = " + subtree.getTreeSize());
-		//subtree.printTree(root);
+		//cleanup(root);
 		
-		return root;		
+		System.out.println("Subtree size = " + subtree.getTreeSize());
+		subtree.printTree(root);
+		
+		return subtree;		
 	}
 	
 	private boolean remove(Node n) {
@@ -267,7 +279,7 @@ public class P2 {
 				System.out.println("	" + n.getChildren().get(i).getComponent().getStart() + "," + n.getChildren().get(i).getComponent().getEnd());
 			}
 		}*/
-		for(int i=0; i<n.getChildrenSize(); i++) {
+		for(int i=n.getChildrenSize()-1; i>=0; i--) {
 			/*if(n.getChildren().get(i).getComponent() == null) {
 				System.out.println("Calling remove on square");
 			}
@@ -290,13 +302,15 @@ public class P2 {
 			if(n.getType().equals("square") || n.getComponent().getOrientation()==true) {
 				return false;
 			}
+			else {
+				return true;
+			}
 		}
-		else {
-			return true;
-		}
+		
 		
 		return true;
 	}
+	
 	
 	// Find out if a component is oriented
 	// unoriented component: has one or more breakpoints, and (p,q) have the same sign
@@ -329,5 +343,18 @@ public class P2 {
 		}
 		return false;
 	}
+	
+	// Calculated using Theorem 3, page 395 of the paper
+	private int findCoverCost(Tree tree) {
+		int leavesCount = tree.getLeavesCount();
+		
+		if(!tree.hasShortBranch()) {
+			return leavesCount+1;
+		}
+		else {
+			return leavesCount;
+		}
+	}
+
 }
 	

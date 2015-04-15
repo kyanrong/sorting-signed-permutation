@@ -1,7 +1,8 @@
 import java.util.*;
 import java.lang.*;
+import java.io.*;
 
-class phylo{
+class P3{
 	public static ArrayList<ArrayList<Integer>> matrix = new ArrayList<ArrayList<Integer>>();  //store the distance matrix
 	public static ArrayList<IntegerPair> min = new ArrayList<IntegerPair>();   //store the index of minimum distance for each row in the matrix
 	public static HashMap<String,Integer> SpeciesA =new HashMap<String,Integer>(); //key is the name
@@ -14,7 +15,11 @@ class phylo{
 		Scanner sc = new Scanner(System.in);
 		
 		//GET THE INPUT
-		getInput(sc);
+		try{
+			getInput();
+		}catch(IOException e){
+
+		}
 		
 		CNode root= new CNode();
 	
@@ -22,9 +27,6 @@ class phylo{
 		while(clusters.size()>1){
 		//GET THE MIN VALUE
 		IntegerPair a = getMin();
-		
-
-
 		
 		//GET THE CHILDREN
 		ArrayList<String> childrenList = getChildren(a);
@@ -36,20 +38,9 @@ class phylo{
 		
 		//MERGE NODE
 		merge(a,childrenList,parentNode);
-		for(int h=0;h<clusters.size();h++){
-			System.out.println("The index is " +clusters.get(h).getIndex());
-			System.out.println(clusters.get(h).getChildren());
-		} 
-		System.out.println(" ");
-		
-
-		
-		
+	
 		//FIND THE NEXT MIN VALUE STEP 1
 		ArrayList<IntegerPair> distancesMinVal = getDistances(childrenList);
-		
-		
-
 		
 		
 		//EDIT THE MIN ARRAYLIST
@@ -58,38 +49,96 @@ class phylo{
 		//FIND THE NEXT MIN VALUE STEP 2
 		getMinValues(distancesMinVal);
 		
-	
-	
 		}
 		//WHILE LOOP WILL END HERE
 		
-		//PRINTING THE TREE
-		//START FROM ROOT
+		//PRINTING THE TREE START FROM ROOT
 		printBinaryTree(root,0);
-
 
 	}
 
 	
-
-//CODE OBTAINED FROM: http://stackoverflow.com/questions/4965335/how-to-print-binary-tree-diagram
-public static void printBinaryTree(CNode root,int level){
-    if(root==null)
-         return;
-    printBinaryTree(root.getChildR(),level+1);
-    if(level!=0){
-        for(int i=0;i<level-1;i++)
-            System.out.print("|\t");
-            System.out.println("|-------"+root.getIndex());
-    }
-    else
-        System.out.println(root.getIndex());
-    printBinaryTree(root.getChildL(),level+1);
+	//CODE WITH REFERENCE FROM: http://stackoverflow.com/questions/4965335/how-to-print-binary-tree-diagram
+	public static void printBinaryTree(CNode root,int level){
+   		if(root==null)
+        	return;
+    	printBinaryTree(root.getChildR(),level+1);
+    	if(level!=0){
+        	for(int i=0;i<level-1;i++)
+            	System.out.print("|\t");
+            	System.out.println("|-------" +root.getIndex() +"("+root.getDistance()+ ")");
+    	}
+    	else
+        	System.out.println(root.getIndex());
+    	
+    	printBinaryTree(root.getChildL(),level+1);
 }
 
 
+	private static void getInput() throws IOException {
+		Scanner sc = new Scanner(System.in);
+		String path = sc.nextLine();
+		//String path = "datasets/viral_genome.txt";
+		;
+		
+		FileReader fr = new FileReader(new File(path));
+		BufferedReader br = new BufferedReader(fr);
+		
+		String line;
+		String name = null;
+		int num = 0;
+		int minRow = 10000;
+		int rowIndex = 0;
+		int colIndex = 0;
+		int count = 0;
+		while((line=br.readLine())!= null) {
+			String[] scores = line.split("\\s+");
+			name = scores[0].substring(0,scores[0].length()-1);
+			
+			SpeciesA.put(name,count);
+			SpeciesB.put(count,name);
+
+
+			CNode newNode = new CNode(null,"leaf",name);
+			ArrayList<String> dummy = new ArrayList<String>();
+			cluster clusterNew = new cluster(count,dummy,newNode);
+			clusters.add(clusterNew);
+			ArrayList<Integer> row = new ArrayList<Integer>();
+			minRow=10000000;
+
+			for(int x=1;x<scores.length;x++){
+				String temp = scores[x].trim();
+				 
+				 if(x!=scores.length-1){
+				 temp = temp.substring(0,scores[x].length()-1);
+				 }
+				num = Integer.parseInt(temp);
+				System.out.println("num is " +num);
+				if(num < minRow && count!=x-1){
+					minRow = num;
+					rowIndex=count;
+					colIndex=x-1;
+				}
+				row.add(num);	
+
+			}
+
+		IntegerPair values = new IntegerPair(rowIndex,colIndex,minRow);
+		boolean check = min.add(values);
+		matrix.add(row);		
+		count++;		
+			
+		}
+		numNodes = count;
+		
+		br.close();
+		sc.close();
+	}
+
+
+
 	//Method to obtain input
-	private static void getInput(Scanner sc){
+	/*private static void getInput(Scanner sc){
 		
 		numNodes = sc.nextInt();
 		String name ="";
@@ -130,7 +179,7 @@ public static void printBinaryTree(CNode root,int level){
 		}
 		
 			
-	}
+	} */
 	
 	
 	//Method to obtain the minimum pairwise distance from minValues matrix
@@ -151,16 +200,11 @@ public static void printBinaryTree(CNode root,int level){
 		
 		ArrayList<String> children = new ArrayList<String>();
 		
-		
-		
 		//if both are nested clusters, the children arraylist will contain both cluster
 		if(clusters.get(minV.getA()).getIndex()>=SpeciesA.size() && clusters.get(minV.getB()).getIndex()>=SpeciesA.size()){
 			ArrayList<String> A = clusters.get(minV.getA()).getChildren();
 			ArrayList<String> B = clusters.get(minV.getB()).getChildren();
-			
-
-
-			 children = mergeChildren(A,B);			
+			children = mergeChildren(A,B);			
 		}
 		//if A is a cluster and B is a node 
 		else if(clusters.get(minV.getA()).getIndex()>=SpeciesA.size() && clusters.get(minV.getB()).getIndex()<SpeciesA.size()){
@@ -168,19 +212,16 @@ public static void printBinaryTree(CNode root,int level){
 			children.add(SpeciesB.get(clusters.get(minV.getB()).getIndex()));
 		}
 		//if B is a cluster and A is a node
-		
-
 		else if(clusters.get(minV.getB()).getIndex()>=SpeciesA.size() && clusters.get(minV.getA()).getIndex()<SpeciesA.size()){
 			children = clusters.get(minV.getB()).getChildren();
 			children.add(SpeciesB.get(clusters.get(minV.getA()).getIndex()));
 		}
+		//else both A nd B are nodes
 		else{
 			children.add(SpeciesB.get(clusters.get(minV.getA()).getIndex()));
-			children.add(SpeciesB.get(clusters.get(minV.getB()).getIndex()));
-			
+			children.add(SpeciesB.get(clusters.get(minV.getB()).getIndex()));	
 		}
 		
-
 		return children;
 	}
 
@@ -199,15 +240,10 @@ public static void printBinaryTree(CNode root,int level){
 
 	//Method to obtain new distances
 	private static ArrayList<IntegerPair> getDistances(ArrayList<String> children){
-		
-
-
 		int sum=0;
 		int count = 0;
 		
-		
 		ArrayList<IntegerPair> newDist = new ArrayList<IntegerPair>();
-		
 		IntegerPair dum = new IntegerPair(0,0,0);
 		newDist.add(dum);
 
@@ -218,14 +254,13 @@ public static void printBinaryTree(CNode root,int level){
 					
 					child = clusters.get(i).getChildren();
 					
-
 					for(int x=0;x<children.size();x++){
 						int indexA = SpeciesA.get(children.get(x));
 						for(int y=0;y<child.size();y++){
 						int indexB = SpeciesA.get(child.get(y));
 						 	sum = sum +matrix.get(indexA).get(indexB);
 						 	
-					}
+						}
 					}
 					//sum = sum * (1/(children.size() * child.size()));
 					double tempSum = (double) 1/(children.size() *child.size());
@@ -248,14 +283,13 @@ public static void printBinaryTree(CNode root,int level){
 					
 			}
 				
-				IntegerPair c = new IntegerPair(0,i,sum);
-				newDist.add(c);
-		sum = 0;
-			
-		
-	}
+			IntegerPair c = new IntegerPair(0,i,sum);
+			newDist.add(c);
+			sum = 0;	
+		}
 	return newDist;
 	}
+	
 	//Method to find and store the minimum values
 	private static void getMinValues(ArrayList<IntegerPair> newDist){
 		ArrayList<IntegerPair> temp = new ArrayList<IntegerPair>();
@@ -263,10 +297,7 @@ public static void printBinaryTree(CNode root,int level){
 		int index = 0 ;
 		temp.add(new IntegerPair(0,0,0));
 
-		
-		
 		for(int i =1;i<newDist.size();i++){
-			
 			
 			//get the min value for the new cluster	
 			if(minTotal > newDist.get(i).getDistance()){
@@ -274,25 +305,18 @@ public static void printBinaryTree(CNode root,int level){
 				 index = i;
 			}
 			if(clusters.size()>2){
-			//get the min value for the other clusters
-			if(min.get(i-1).getDistance() > newDist.get(i).getDistance()){
-				IntegerPair x = new IntegerPair(i,0,newDist.get(i).getDistance());
-				temp.add(x);
-				
-
-			}else{
-				IntegerPair v = min.get(i-1);
-				
-				temp.add(min.get(i-1));
-				
+				//get the min value for the other clusters
+				if(min.get(i-1).getDistance() > newDist.get(i).getDistance()){
+					IntegerPair x = new IntegerPair(i,0,newDist.get(i).getDistance());
+					temp.add(x);
+			
+				}else{
+					IntegerPair v = min.get(i-1);
+					temp.add(min.get(i-1));
+				}
 			}
-		}
 		
 		}
-		
-		
-
-
 
 		temp.set(0,new IntegerPair(0,index,minTotal));
 		
@@ -301,14 +325,38 @@ public static void printBinaryTree(CNode root,int level){
 	}
 	
 	private static CNode getNewNode(IntegerPair minV){
-		CNode newParent = new CNode(null,"inner","|");
+		CNode newParent = new CNode(null,"inner","");
 		CNode nodeA = clusters.get(minV.getA()).getNode();
 		nodeA.setParent(newParent);
+		if(nodeA.getType().equals("leaf")){
+			double dist = Math.floor((double)minV.getDistance()/2);
+			nodeA.addDistance((int)dist);
+			nodeA.addTotalDistance((int)dist);
+		}else{
+			double dist = Math.floor((double)minV.getDistance()/2);
+			int d = (int)dist;
+			int currentD = nodeA.getChildR().getTotalDistance();
+			nodeA.addDistance(d-currentD);
+
+		}
+		
 		CNode nodeB = clusters.get(minV.getB()).getNode();
 		nodeB.setParent(newParent);
+		if(nodeB.getType().equals("leaf")){
+			double dist = Math.floor((double)minV.getDistance()/2);
+			nodeB.addDistance((int)dist);
+			nodeB.addTotalDistance((int)dist);
+		}else{
+			double dist = Math.floor((double)minV.getDistance()/2);
+			int d = (int)dist;
+			int currentD = nodeB.getChildR().getTotalDistance();
+			nodeB.addDistance(d-currentD);
+			
+		}
 
 		newParent.addChildL(nodeA);
 		newParent.addChildR(nodeB);
+		newParent.addTotalDistance(minV.getDistance());
 
 		return newParent;
 	}
@@ -316,26 +364,13 @@ public static void printBinaryTree(CNode root,int level){
 
 	//Method to merge 2 clusters/node
 	private static void merge(IntegerPair minV,ArrayList<String> children,CNode newParent){
-		
-		
-		/*CNode newParent = new CNode(null,"inner",numNodes++);
-		CNode nodeA = cluster.get(minV.getA()).getNode();
-		nodeA.setParent(newParent);
-		CNode nodeB = cluster.get(minV.getB()).getNode();
-		nodeB.setParent(newParent);
-
-		newParent.addChild(nodeA);
-		newParent.addChild(nodeB);
-		*/
 
 		cluster newCluster = new cluster(numNodes++,children,newParent);
 		
-
 		ArrayList<cluster> tempCluster = new ArrayList<cluster>();
 		tempCluster.add(newCluster);
 		
 		for(int i=0;i<min.size();i++){
-			
 			
 			if(i!=minV.getA() && i!= minV.getB()){
 				tempCluster.add(clusters.get(i));
@@ -344,7 +379,7 @@ public static void printBinaryTree(CNode root,int level){
 		clusters.clear();
 		clusters=tempCluster;
 	}
-
+	//EDIT THE MIN ARRAYLIST-UPDATE ACCORDING TO LATEST CLUSTER FORMATION
 	private static void editMin(IntegerPair minimum){
 		
 		ArrayList<IntegerPair> storage = new ArrayList<IntegerPair>();
