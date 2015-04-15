@@ -30,12 +30,16 @@ public class P1 {
 	private void getInput() {
 		Scanner sc = new Scanner(System.in);
 		int i = 4;
+		String name = null;
 		while(i != 0) {
 			String line = sc.nextLine();
-			if(!line.startsWith(">")) {
+			if(line.startsWith(">")) {
+				name = line.split("> ")[1];
+			}
+			else {
 				String[] seq = line.split(", ");
 				seq_len = seq.length+2;				// +2 to add 0 and n+1 to the seq
-				PermutationPair pp = separate(seq);
+				PermutationPair pp = separate(seq, name);
 				permutations.add(pp);
 			}
 			i--;
@@ -44,7 +48,7 @@ public class P1 {
 	}
 	
 	// separate into unsigned elements and their signs
-	private PermutationPair separate(String[] seq) {
+	private PermutationPair separate(String[] seq, String name) {
 		ArrayList<Integer> pi = new ArrayList<Integer>();
 		ArrayList<Boolean> sigma = new ArrayList<Boolean>();
 		
@@ -64,7 +68,7 @@ public class P1 {
 				
 		pi.add(seq_len-1); sigma.add(true);
 		
-		return new PermutationPair(pi, sigma);
+		return new PermutationPair(pi, sigma, name);
 	}
 	
 	// pi contains the unsigned elements
@@ -229,6 +233,8 @@ public class P1 {
 		//System.out.println("Subtree size = " + subtree.getTreeSize());
 		//subtree.printTree(root);
 		
+		//System.out.println("Subtree leaves count = " + subtree.getLeavesCount());
+		
 		return root;		
 	}
 	
@@ -308,11 +314,10 @@ public class P1 {
 	
 	// input the root node of T'(only has all unoriented components)
 	private ArrayList<Path> findCover(Node n) {
-		int count = 0;
 		ArrayList<Path> cover = new ArrayList<Path>();
 		ArrayList<Component> list = new ArrayList<Component>();
 		
-		list = visit(n, count, cover, list);
+		list = visit(n, cover, list);
 		cover.add(new Path(list.get(0)));
 		
 		System.out.println("Cover size = " + cover.size());
@@ -328,9 +333,9 @@ public class P1 {
 		return cover;
 	}
 	
-	private ArrayList<Component> visit(Node n, int count, ArrayList<Path> cover, ArrayList<Component> list) {
+	private ArrayList<Component> visit(Node n, ArrayList<Path> cover, ArrayList<Component> list) {
 		for(int i=0; i<n.getChildrenSize(); i++) {
-			visit(n.getChildren().get(i), count, cover, list);
+			visit(n.getChildren().get(i), cover, list);
 		}
 		// leaves are confirmed to be unoriented
 		if(!n.hasChild() && !n.getVisited() && list.isEmpty()) {
