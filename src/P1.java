@@ -20,10 +20,11 @@ public class P1 {
 		p1 = findComponents(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr());
 		//p2 = findComponents(permutations.get(1).getPiArr(), permutations.get(1).getSigmaArr());
 		
-		Node subtreeRoot = constructTree(p1, seq_len);
+		Tree subtree = constructTree(p1, seq_len);
+		Node subtreeRoot = subtree.getRoot();
 		ArrayList<Path> cover = findCover(subtreeRoot);
 		orientComponents(cover, permutations.get(0));
-		
+		findCoverCost(subtree);
 		//constructTree(p2, seq_len);
 	}
 	
@@ -184,7 +185,7 @@ public class P1 {
 		return pair;
 	}
 	
-	private Node constructTree(ComponentPair pair, int n) {
+	private Tree constructTree(ComponentPair pair, int n) {
 		ArrayList<Component> c_s = pair.getCStart();
 		ArrayList<Component> c_e = pair.getCEnd();
 		
@@ -217,14 +218,13 @@ public class P1 {
 		//System.out.println("Tree size = " + tree.getTreeSize());
 		//tree.printTree(root);
 		
-		Node subtreeRoot = generateSubtree(tree);
-		return subtreeRoot;
+		return generateSubtree(tree);
 	}
 	
 	// Generate T': the smallest subtree of T that contains all unoriented components of P
 	// obtained by recursively removing from T all dangling oriented components and square nodes (post-order traversal)
 	// All leaves of T' will be unoriented components, while internal round nodes may still represent oriented components
-	private Node generateSubtree(Tree t) {
+	private Tree generateSubtree(Tree t) {
 		//System.out.println("Generating subtree ...");
 		Node root = t.getRoot();
 		boolean result = remove(root);
@@ -235,7 +235,7 @@ public class P1 {
 		
 		//System.out.println("Subtree leaves count = " + subtree.getLeavesCount());
 		
-		return root;		
+		return subtree;		
 	}
 	
 	private boolean remove(Node n) {
@@ -379,6 +379,7 @@ public class P1 {
 	
 	// c1 and c2 are in order, so c1's startidx will always be smallest
 	private void merge(Component c1, Component c2, PermutationPair pp) {
+
 		int startidx = c1.getStart();
 		int endidx = c2.getEnd();
 		ArrayList<Integer> pi = pp.getPiArr();
@@ -390,5 +391,17 @@ public class P1 {
 		}
 		Collections.reverse(sigma.subList(startidx, endidx+1));
 		
+	}
+	
+	// Calculated using Theorem 3, page 395 of the paper
+	private int findCoverCost(Tree tree) {
+		int leavesCount = tree.getLeavesCount();
+		
+		if(!tree.hasShortBranch()) {
+			return leavesCount+1;
+		}
+		else {
+			return leavesCount;
+		}
 	}
 }
