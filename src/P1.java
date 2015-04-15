@@ -404,4 +404,101 @@ public class P1 {
 			return leavesCount;
 		}
 	}
+	
+	private PermutationPair Bergeron(ArrayList<Integer> pi, ArrayList<Boolean> sigma){
+		PermutationPair idseq = null;
+		ArrayList<Boolean> sign = null;
+		ArrayList<Integer> ppi = new ArrayList<Integer>();
+		ArrayList<Boolean> sig = new ArrayList<Boolean>();
+		PermutationPair seq = new PermutationPair (pi, sigma);
+		for (int i = 1; i<pi.size(); i++){
+			ppi.add(i, i);
+			sig.add(i, true);
+		}
+		idseq = new PermutationPair (ppi, sig);
+
+		int index=-1;
+		int l = -1; int s = 0;
+		while (seq != idseq){
+			for (int j = 0; j <= pi.size()-1; j++){
+				sign.set(j, sigma.get(j));
+			}
+			for (int k = 0; k <= pi.size()-1; k++){
+				index = pi.indexOf(k);
+				if(sign.get(k) != sign.get(k+1) && pi.get(k+1) - pi.get(k) != 1){
+					int t = score(reversal(index, pi, sign));
+					if(t>s){
+						l = k;
+						s = t;
+					}
+				}
+			}
+		}
+		PermutationPair permutation = reversal(l,pi,sign);
+		
+		return permutation;
+	}
+
+	private PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign) {
+		PermutationPair permutation = new PermutationPair (pi, sign);
+		for (int i = 0; i <= pi.size()-1; i++){
+			int n_index = pi.indexOf(i+1);
+			int st = -1;
+			int en = -1;
+			if (index < n_index){
+				st = index;
+				en = n_index;
+			}else{
+				st = n_index;
+				en = index;
+			}
+			int revLen = (en - st + 1)/2;
+			if (sign.get(st) != sign.get(en)){
+				if (sign.get(st) == true){
+					if(sign.get(en) == false){
+						for (int j = 0; j <= revLen-1; j++){
+							int n_en = permutation.getPiArr().get(st);
+							permutation.getPiArr().set(st+1, permutation.getPiArr().get(en));
+							permutation.getSigmaArr().set(st+1, !permutation.getSigmaArr().get(en));
+							permutation.getPiArr().set(en, n_en);
+							st++;
+							en++;
+						}
+					}else{
+						for (int j = 0; j <= revLen-1; j++){
+							int n_en = permutation.getPiArr().get(st);
+							permutation.getPiArr().set(st+1, permutation.getPiArr().get(en-1));
+							permutation.getSigmaArr().set(st+1, !permutation.getSigmaArr().get(en-1));
+							permutation.getPiArr().set(en, n_en);
+							st++;
+							en++;
+						}
+
+					}
+				}
+				if (sign.get(st) == false){
+					if(sign.get(en) == false){
+						for (int j = 0; j <= revLen-1; j++){
+							int n_en = permutation.getPiArr().get(st);
+							permutation.getPiArr().set(st, permutation.getPiArr().get(en));
+							permutation.getSigmaArr().set(st, !permutation.getSigmaArr().get(en));
+							permutation.getPiArr().set(en, n_en);
+							st++;
+							en++;
+						}
+					}else{
+						for (int j = 0; j <= revLen-1; j++){
+							int n_en = permutation.getPiArr().get(st);
+							permutation.getPiArr().set(st, permutation.getPiArr().get(en-1));
+							permutation.getSigmaArr().set(st, !permutation.getSigmaArr().get(en-1));
+							permutation.getPiArr().set(en, n_en);
+							st++;
+							en++;
+						}
+					}
+				}
+			}
+		}
+		return permutation;
+	}
 }
