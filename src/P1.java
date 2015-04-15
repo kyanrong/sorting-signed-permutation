@@ -26,6 +26,7 @@ public class P1 {
 		orientComponents(cover, permutations.get(0));
 		findCoverCost(subtree);
 		//constructTree(p2, seq_len);
+		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr());
 	}
 	
 	private void getInput() {
@@ -405,7 +406,26 @@ public class P1 {
 		}
 	}
 	
-	private PermutationPair Bergeron(ArrayList<Integer> pi, ArrayList<Boolean> sigma){
+	private int score (PermutationPair pair){
+		int count = 0;
+		ArrayList<Boolean> sign;
+		sign = null;
+		ArrayList<Integer>pi = pair.getPiArr();
+		ArrayList<Boolean>sigma = pair.getSigmaArr();
+
+		for (int i = 0; i <= pi.size(); i++){
+			sign.set(i, sigma.get(i));
+		}
+		for (int j = 0; j <= pi.size()-1; j++){
+			if (sign.get(j) != sign.get(j+1)){
+				count++;
+			}
+		}
+		return count;
+	}
+
+	
+	private PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma){
 		PermutationPair idseq = null;
 		ArrayList<Boolean> sign = null;
 		ArrayList<Integer> ppi = new ArrayList<Integer>();
@@ -435,6 +455,7 @@ public class P1 {
 			}
 		}
 		PermutationPair permutation = reversal(l,pi,sign);
+		//call mapper
 		
 		return permutation;
 	}
