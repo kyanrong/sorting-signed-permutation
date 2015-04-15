@@ -1,7 +1,9 @@
 class IntegerPair{
-	private static int A;
-	private static int B;
-	private static int distance;
+	private  int A;
+	private  int B;
+	private String nameA;
+	private String nameB;
+	private int distance;
 
 
 	public IntegerPair(int a, int b,int value){
@@ -10,15 +12,26 @@ class IntegerPair{
 		distance = value;
 	}
 
-	public static int getA(){
+	public IntegerPair(int a, int b,int value,String nameX,String nameY){
+		A = a;
+		B = b;
+		distance = value;
+		nameA = nameX;
+		nameB = nameY;
+	}
+
+
+	public  int getA(){
 		return A;
 	}
 
-	public static int getB(){
+	public  int getB(){
 		return B;
 	}
 
-	public static int getDistance(){
+	public  int getDistance(){
 		return distance;
 	}
-}
+
+	
+} 

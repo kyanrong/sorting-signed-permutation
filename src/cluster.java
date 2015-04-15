@@ -2,26 +2,34 @@ import java.util.*;
 import java.lang.*;
 
 class cluster{
-	private static ArrayList<String> children = new ArrayList<String>();
-	private static int numSpecies;
-	private static int index;
+	private  ArrayList<String> children = new ArrayList<String>();
+	private  int numSpecies;
+	private  int index;
+	private CNode node;
 
-	public cluster(int speciesIndex, ArrayList<String> list){
+	public cluster(int speciesIndex, ArrayList<String> list,CNode newNode){
 		index = speciesIndex;
 		children = list;
 		numSpecies = children.size();
+		node = newNode;
 	}
 
 	public ArrayList<String> getChildren(){
-		return children;
+
+			return children;
+	
 	}
 
 	public int getNumSpecies(){
-		return numSpecies;
+		return children.size();
 	}
 
 	public int getIndex(){
 		return index;
+	}
+
+	public CNode getNode(){
+		return node;
 	}
 
 }
