@@ -45,7 +45,7 @@ public class Mapper {
 		for(int i=0;i<oriB_Unsigned.size();i++) {
 			int key = oriB_Unsigned.get(i);
 			hm.put(key,i);
-			System.out.println("the key is: "+key +" the i is: "+i);
+			/*System.out.println("the key is: "+key +" the i is: "+i);*/
 		}
 		//change sign convert
 		
@@ -56,10 +56,10 @@ public class Mapper {
 				signConvert[i] = false;
 			}
 		}
-		for(int j = 0; j<signConvert.length;j++) {
+		/*for(int j = 0; j<signConvert.length;j++) {
 			System.out.print(signConvert[j]+"|");
 		}
-		System.out.println();
+		System.out.println();*/
 	}
 	
 	public void createNewSeq() {
@@ -155,7 +155,7 @@ public class Mapper {
 		Mapper mup = new Mapper(start, end, signsStart,signsEnd);
 		ArrayList<Integer> test = mup.getNewStartUnsigned();
 		ArrayList<Boolean> test2 = mup.getNewStartSign();
-		for(int i = 0; i<test.size();i++) {
+		/*for(int i = 0; i<test.size();i++) {
 			
 			System.out.print(test.get(i)+"|");
 			
@@ -166,13 +166,13 @@ public class Mapper {
 		for(int j = 0; j<test2.size();j++) {
 			System.out.print(test2.get(j)+"|");
 		}
-		System.out.println();
+		System.out.println();*/
 		ArrayList<Boolean> test3 = mup.getNewStartSign();
 		ArrayList<Integer> test4 = mup.getCurrentReversal(test,test3);
 		
-		for(int j = 0; j<test4.size();j++) {
+		/*for(int j = 0; j<test4.size();j++) {
 			System.out.print(test4.get(j)+"|");
-		}
+		}*/
 	}
 	
 	
