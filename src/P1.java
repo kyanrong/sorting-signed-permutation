@@ -26,7 +26,7 @@ public class P1 {
 		orientComponents(cover, permutations.get(0));
 		findCoverCost(subtree);
 		//constructTree(p2, seq_len);
-		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr(), permutations.get(0).getName());
+		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr());
 	}
 	
 	private void getInput() {
@@ -231,8 +231,8 @@ public class P1 {
 		boolean result = remove(root);
 		Tree subtree = new Tree(root);
 
-		System.out.println("Subtree size = " + subtree.getTreeSize());
-		subtree.printTree(root);
+		//System.out.println("Subtree size = " + subtree.getTreeSize());
+		//subtree.printTree(root);
 		
 		//System.out.println("Subtree leaves count = " + subtree.getLeavesCount());
 		
@@ -272,11 +272,10 @@ public class P1 {
 			if(n.getType().equals("square") || n.getComponent().getOrientation()==true) {
 				return false;
 			}
-			else {
-				return true;
-			}
 		}
-		
+		else {
+			return true;
+		}
 		
 		return true;
 	}
@@ -424,33 +423,25 @@ public class P1 {
 	}
 
 	
-<<<<<<< HEAD
 	private static PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma){
-=======
-	private PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma, String name){
->>>>>>> 0546d031ad40526cab5e377dcaa1927bc66c9114
 		PermutationPair idseq = null;
-		ArrayList<Boolean> sign = null;
+		ArrayList<Boolean> sign = new ArrayList<Boolean>();
+		String name = null;
 		ArrayList<Integer> ppi = new ArrayList<Integer>();
 		ArrayList<Boolean> sig = new ArrayList<Boolean>();
 		
 		//The given sequence
 		PermutationPair seq = new PermutationPair (pi, sigma, name);
-		for (int i = 1; i<pi.size(); i++){
+		for (int i = 0; i<pi.size(); i++){
 			ppi.add(i, i);
 			sig.add(i, true);
 		}
 		//The identity sequence
 		idseq = new PermutationPair (ppi, sig, name);
-<<<<<<< HEAD
 		
-=======
-
->>>>>>> 0546d031ad40526cab5e377dcaa1927bc66c9114
 		int index=-1;
 		//l refers to the index of the interval that gives the max score  and s refers to max score
 		int l = -1; int s = 0;
-<<<<<<< HEAD
 		//do while loop the pi is not the identity sequence
 		
 			int count =0;
@@ -469,23 +460,12 @@ public class P1 {
 				if(sign.get(index) != sign.get(indexA) && indexA-index !=1){
 					int t = score(reversal(index, pi, sign));
 					
-=======
-		while (seq != idseq){
-			for (int j = 0; j <= pi.size()-1; j++){
-				sign.set(j, sigma.get(j));
-			}
-			for (int k = 0; k <= pi.size()-1; k++){
-				index = pi.indexOf(k);
-				if(sign.get(k) != sign.get(k+1) && pi.get(k+1) - pi.get(k) != 1){
-					int t = score(reversal(index, pi, sign, name));
->>>>>>> 0546d031ad40526cab5e377dcaa1927bc66c9114
 					if(t>s){
 						l = index;
 						s = t;
 					}
 				}
 			}
-<<<<<<< HEAD
 		
 		PermutationPair permutation = reversal(l,pi,sign);
 		
@@ -575,51 +555,9 @@ public class P1 {
 			Boolean checkEnd = tempSign.get(endIndex);
 			if(checkStart==true){
 				tempSign.set(endIndex,false);
-=======
-		}
-		PermutationPair permutation = reversal(l,pi,sign, name);
-		//call mapper
-		
-		return permutation;
-	}
-
-	private PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign, String name) {
-		PermutationPair permutation = new PermutationPair (pi, sign, name);
-		for (int i = 0; i <= pi.size()-1; i++){
-			int n_index = pi.indexOf(i+1);
-			int st = -1;
-			int en = -1;
-			if (index < n_index){
-				st = index;
-				en = n_index;
->>>>>>> 0546d031ad40526cab5e377dcaa1927bc66c9114
 			}else{
 				tempSign.set(endIndex,true);
 			}
-<<<<<<< HEAD
-=======
-			int revLen = (en - st + 1)/2;
-			if (sign.get(st) != sign.get(en)){
-				if (sign.get(st) == true){
-					if(sign.get(en) == false){
-						for (int j = 0; j <= revLen-1; j++){
-							int n_en = permutation.getPiArr().get(st);
-							permutation.getPiArr().set(st+1, permutation.getPiArr().get(en));
-							permutation.getSigmaArr().set(st+1, !permutation.getSigmaArr().get(en));
-							permutation.getPiArr().set(en, n_en);
-							st++;
-							en++;
-						}
-					}else{
-						for (int j = 0; j <= revLen-1; j++){
-							int n_en = permutation.getPiArr().get(st);
-							permutation.getPiArr().set(st+1, permutation.getPiArr().get(en-1));
-							permutation.getSigmaArr().set(st+1, !permutation.getSigmaArr().get(en-1));
-							permutation.getPiArr().set(en, n_en);
-							st++;
-							en++;
-						}
->>>>>>> 0546d031ad40526cab5e377dcaa1927bc66c9114
 
 			if(checkEnd==true){
 				tempSign.set(startIndex,false);
