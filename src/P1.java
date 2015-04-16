@@ -320,17 +320,20 @@ public class P1 {
 		ArrayList<Component> list = new ArrayList<Component>();
 
 		list = visit(n, cover, list);
-		cover.add(new Path(list.get(0)));
+		if(list.size()!=0) {
+			cover.add(new Path(list.get(0)));
+		}
+		
 
 		System.out.println("Cover size = " + cover.size());
-		for(int i=0; i<cover.size(); i++) {
+		/*for(int i=0; i<cover.size(); i++) {
 			if(cover.get(i).getEndComponent() != null) {
 				System.out.println("	" + cover.get(i).getStartComponent().getStart() + "," + cover.get(i).getStartComponent().getEnd() + " to " + cover.get(i).getEndComponent().getStart() + "," + cover.get(i).getEndComponent().getEnd() );
 			}
-			/*else {
+			else {
 				System.out.println("	" + cover.get(i).getStartComponent().getStart()+","+cover.get(i).getStartComponent().getEnd());
-			}*/
-		}	
+			}
+		}*/
 
 		return cover;
 	}
@@ -358,6 +361,9 @@ public class P1 {
 	private void orientComponents(ArrayList<Path> cover, PermutationPair pp) {
 		for(int i=0; i<cover.size(); i++) {
 			if(cover.get(i).getSize() == 1) {
+				if(cover.get(i).getStartComponent() == null) {
+					return;
+				}
 				cut(cover.get(i).getStartComponent(), pp);
 			}
 			else {

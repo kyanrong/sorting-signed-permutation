@@ -50,7 +50,7 @@ public class P2 {
 	}
 	
 	private void getInput() throws IOException {
-		String path = "eg2.txt";
+		String path = "datasets/eg2.txt";
 		SeqParser sp = new SeqParser(path);
 		SeqExtractor se = new SeqExtractor(sp.getSequence());
 		speciesNames = sp.getSpecies();
