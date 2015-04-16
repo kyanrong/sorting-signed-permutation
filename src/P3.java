@@ -261,7 +261,7 @@ private static void process(int[][] dist, ArrayList<String> names){
 					}
 					
 					 double tempSum = (double) 1/(children.size());
-					tempSum = Math.floor(sum * tempSum);
+					tempSum = Math.ceil(sum * tempSum);
 					sum =(int) tempSum;
 					
 			}
