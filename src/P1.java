@@ -26,7 +26,7 @@ public class P1 {
 		orientComponents(cover, permutations.get(0));
 		findCoverCost(subtree);
 		//constructTree(p2, seq_len);
-		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr(), permutations.get(0).getName());
+		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr());
 	}
 	
 	private void getInput() {
@@ -231,8 +231,8 @@ public class P1 {
 		boolean result = remove(root);
 		Tree subtree = new Tree(root);
 
-		System.out.println("Subtree size = " + subtree.getTreeSize());
-		subtree.printTree(root);
+		//System.out.println("Subtree size = " + subtree.getTreeSize());
+		//subtree.printTree(root);
 		
 		//System.out.println("Subtree leaves count = " + subtree.getLeavesCount());
 		
@@ -272,11 +272,10 @@ public class P1 {
 			if(n.getType().equals("square") || n.getComponent().getOrientation()==true) {
 				return false;
 			}
-			else {
-				return true;
-			}
 		}
-		
+		else {
+			return true;
+		}
 		
 		return true;
 	}
@@ -407,18 +406,16 @@ public class P1 {
 		}
 	}
 	
-	private int score (PermutationPair pair){
+	private static int score (PermutationPair pair){
 		int count = 0;
-		ArrayList<Boolean> sign;
-		sign = null;
+		ArrayList<Boolean> sign = new ArrayList<Boolean>();
 		ArrayList<Integer>pi = pair.getPiArr();
 		ArrayList<Boolean>sigma = pair.getSigmaArr();
-
-		for (int i = 0; i <= pi.size(); i++){
-			sign.set(i, sigma.get(i));
-		}
-		for (int j = 0; j <= pi.size()-1; j++){
-			if (sign.get(j) != sign.get(j+1)){
+		
+		for (int j = 0; j <sigma.size()-1; j++){
+			int a = pi.indexOf(j);
+			int b = pi.indexOf(j+1);
+			if (sigma.get(a) != sigma.get(b)){
 				count++;
 			}
 		}
@@ -426,101 +423,153 @@ public class P1 {
 	}
 
 	
-	private PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma, String name){
+	private static PermutationPair Bergerone(ArrayList<Integer> pi, ArrayList<Boolean> sigma){
 		PermutationPair idseq = null;
-		ArrayList<Boolean> sign = null;
+		ArrayList<Boolean> sign = new ArrayList<Boolean>();
+		String name = null;
 		ArrayList<Integer> ppi = new ArrayList<Integer>();
 		ArrayList<Boolean> sig = new ArrayList<Boolean>();
+		
+		//The given sequence
 		PermutationPair seq = new PermutationPair (pi, sigma, name);
-		for (int i = 1; i<pi.size(); i++){
+		for (int i = 0; i<pi.size(); i++){
 			ppi.add(i, i);
 			sig.add(i, true);
 		}
+		//The identity sequence
 		idseq = new PermutationPair (ppi, sig, name);
-
+		
 		int index=-1;
+		//l refers to the index of the interval that gives the max score  and s refers to max score
 		int l = -1; int s = 0;
-		while (seq != idseq){
-			for (int j = 0; j <= pi.size()-1; j++){
-				sign.set(j, sigma.get(j));
+		//do while loop the pi is not the identity sequence
+		
+			int count =0;
+			
+			for (int j = 0; j <= sigma.size()-1; j++){
+				sign.add(sigma.get(j));
 			}
-			for (int k = 0; k <= pi.size()-1; k++){
+			while(count<6){
+			l=0;
+			s=-1;
+			System.out.println(sign);
+			for (int k = 0; k <pi.size()-1; k++){
 				index = pi.indexOf(k);
-				if(sign.get(k) != sign.get(k+1) && pi.get(k+1) - pi.get(k) != 1){
-					int t = score(reversal(index, pi, sign, name));
+				int indexA = pi.indexOf(k+1);
+
+				if(sign.get(index) != sign.get(indexA) && indexA-index !=1){
+					int t = score(reversal(index, pi, sign));
+					
 					if(t>s){
-						l = k;
+						l = index;
 						s = t;
 					}
 				}
 			}
-		}
-		PermutationPair permutation = reversal(l,pi,sign, name);
-		//call mapper
 		
-		return permutation;
-	}
-
-	private PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign, String name) {
-		PermutationPair permutation = new PermutationPair (pi, sign, name);
-		for (int i = 0; i <= pi.size()-1; i++){
-			int n_index = pi.indexOf(i+1);
-			int st = -1;
-			int en = -1;
-			if (index < n_index){
-				st = index;
-				en = n_index;
-			}else{
-				st = n_index;
-				en = index;
-			}
-			int revLen = (en - st + 1)/2;
-			if (sign.get(st) != sign.get(en)){
-				if (sign.get(st) == true){
-					if(sign.get(en) == false){
-						for (int j = 0; j <= revLen-1; j++){
-							int n_en = permutation.getPiArr().get(st);
-							permutation.getPiArr().set(st+1, permutation.getPiArr().get(en));
-							permutation.getSigmaArr().set(st+1, !permutation.getSigmaArr().get(en));
-							permutation.getPiArr().set(en, n_en);
-							st++;
-							en++;
-						}
-					}else{
-						for (int j = 0; j <= revLen-1; j++){
-							int n_en = permutation.getPiArr().get(st);
-							permutation.getPiArr().set(st+1, permutation.getPiArr().get(en-1));
-							permutation.getSigmaArr().set(st+1, !permutation.getSigmaArr().get(en-1));
-							permutation.getPiArr().set(en, n_en);
-							st++;
-							en++;
-						}
-
-					}
-				}
-				if (sign.get(st) == false){
-					if(sign.get(en) == false){
-						for (int j = 0; j <= revLen-1; j++){
-							int n_en = permutation.getPiArr().get(st);
-							permutation.getPiArr().set(st, permutation.getPiArr().get(en));
-							permutation.getSigmaArr().set(st, !permutation.getSigmaArr().get(en));
-							permutation.getPiArr().set(en, n_en);
-							st++;
-							en++;
-						}
-					}else{
-						for (int j = 0; j <= revLen-1; j++){
-							int n_en = permutation.getPiArr().get(st);
-							permutation.getPiArr().set(st, permutation.getPiArr().get(en-1));
-							permutation.getSigmaArr().set(st, !permutation.getSigmaArr().get(en-1));
-							permutation.getPiArr().set(en, n_en);
-							st++;
-							en++;
-						}
-					}
-				}
-			}
+		PermutationPair permutation = reversal(l,pi,sign);
+		
+		sign.clear();
+		pi.clear();
+		sign = permutation.getSigmaArr();
+		pi = permutation.getPiArr();
+		count++;
 		}
+		
+		
+		PermutationPair permutation = new PermutationPair(pi,sign,null);
+		/*//call mapper
+		for (int a = 1; a <= pi.size()-3; a++){
+		System.out.print(permutation.getSigmaArr().get(a).toString() +  permutation.getPiArr().get(a).toString()+", ");
+		}
+		System.out.println(permutation.getSigmaArr().get(pi.size()-2).toString()+ permutation.getPiArr().get(pi.size()-2).toString());*/
 		return permutation;
 	}
+
+	private static PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign) {
+	String name = null;
+
+	int i = pi.get(index);
+	int iPlus = i+1;
+
+	int indexPlus = pi.indexOf(iPlus);
+	
+	boolean iSign = sign.get(index);
+	boolean iSignPlus = sign.get(indexPlus);
+
+	int startIndex =0;
+	int endIndex = 0;
+	
+	if(index < indexPlus){
+
+		if(iSign == true){
+			startIndex = index+1;
+		}else{
+			startIndex = index;
+		}
+
+		if(iSignPlus==true){
+			endIndex=indexPlus-1;
+		}else{
+			endIndex = indexPlus;
+		}
+
+	}else{
+
+		if(iSignPlus == true){
+			
+			startIndex = indexPlus;
+		}else{
+			startIndex = indexPlus+1;
+		}
+
+		if(iSign==true){
+			endIndex=index;
+		}else{
+			endIndex = index-1;
+		}
+	}
+	
+	int numElements = endIndex - startIndex + 1;
+	int reversalLength=0;
+	if(numElements%2 ==0){
+		reversalLength = numElements/2;
+
+	}else{
+		reversalLength = (numElements/2) +1;
+	}
+	
+	ArrayList<Integer> tempPi = new ArrayList<Integer>();
+	tempPi.addAll(pi);
+	ArrayList<Boolean> tempSign = new ArrayList<Boolean>();
+	tempSign.addAll(sign);
+
+
+	for(int y =0;y<reversalLength;y++){
+			
+			int a = tempPi.get(startIndex);
+			int b = tempPi.get(endIndex);
+			tempPi.set(startIndex,b);
+			tempPi.set(endIndex,a);
+			Boolean checkStart = tempSign.get(startIndex);
+			Boolean checkEnd = tempSign.get(endIndex);
+			if(checkStart==true){
+				tempSign.set(endIndex,false);
+			}else{
+				tempSign.set(endIndex,true);
+			}
+
+			if(checkEnd==true){
+				tempSign.set(startIndex,false);
+			}else{
+				tempSign.set(startIndex,true);
+			}
+			startIndex++;
+			endIndex--;
+		}
+
+		PermutationPair X = new PermutationPair(tempPi,tempSign,"temp");
+		
+		return X;
+}
 }
