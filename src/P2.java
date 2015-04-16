@@ -15,22 +15,39 @@ public class P2 {
 	ArrayList<Tree> subtrees;
 	ArrayList<int[][]> intervals;
 	int[][] dist;			
+	Mapper mapper;
 
 	public P2() throws IOException {
 		System.out.println("********************* P2 *********************");
 		System.out.println("Please input file path: ");
 		
 		permutations = new ArrayList<PermutationPair>();
-		componentPairs = new ArrayList<ComponentPair>();
-		subtrees = new ArrayList<Tree>();
-		intervals = new ArrayList<int[][]>();
-
 		getInput();
-		//dist = new int[permutations.size()][permutations.size()];
-		getComponents();
-		getSubtrees();
-		getCoverCosts();
-		getIntervals();
+		dist = new int[permutations.size()][permutations.size()];
+		
+		for(int i=0; i<permutations.size(); i++) {
+			dist[i][i] = 0;
+		}
+		
+		for(int i=0; i<permutations.size(); i++) {
+			for(int j=i+1; j<permutations.size(); j++) {
+				mapper = new Mapper(permutations.get(i).getPiArr(), permutations.get(j).getPiArr(), permutations.get(i).getSigmaArr(), permutations.get(j).getSigmaArr());
+				ArrayList<Integer> newUnsigned = mapper.getNewStartUnsigned();
+				ArrayList<Boolean> newSign = mapper.getNewStartSign();
+				PermutationPair newP = new PermutationPair(newUnsigned, newSign, permutations.get(i).getName());
+				int score = findScore(newP);
+				dist[i][j] = score;
+				dist[j][i] = score;
+			}
+		}	
+		
+		for(int i=0; i<permutations.size(); i++) {
+			System.out.print(permutations.get(i).getName() + ": ");
+			for(int j=0; j<permutations.size(); j++) {
+				System.out.print(dist[i][j] + ", ");
+			}
+			System.out.println();
+		}
 	}
 	
 	private void getInput() throws IOException {
@@ -60,33 +77,16 @@ public class P2 {
 		sc.close();
 	}
 	
-	private void getComponents() {
-		for(int i=0; i<permutations.size(); i++) {
-			ComponentPair cp = findComponents(permutations.get(i).getPiArr(), permutations.get(i).getSigmaArr());
-			componentPairs.add(cp);
-		}
-	}
-	
-	private void getSubtrees() {
-		for(int i=0; i<componentPairs.size(); i++) {
-			Tree t = constructTree(componentPairs.get(i), seq_len);
-			subtrees.add(t);
-		}
-	}
-	
-	private void getCoverCosts() {
-		for(int i=0; i<permutations.size(); i++) {
-			int cost = findCoverCost(subtrees.get(i));
-			//System.out.println("Cover cost = " + cost);
-		}
-	}
-	
-	private void getIntervals() {
-		for(int i=0; i<permutations.size(); i++) {
-			Node[][] intervals = findIntervals(permutations.get(i));
-			int count = findCyclesCount(intervals);
-			System.out.println("Cycles count = " + count);
-		}
+	// d(P) = n - c + t
+	private int findScore(PermutationPair pp) {
+		ComponentPair cp = findComponents(pp.getPiArr(), pp.getSigmaArr());
+		Tree subtree = constructTree(cp, seq_len);
+		int t = findCoverCost(subtree);
+		Node[][] intervals = findIntervals(pp);
+		int c = findCyclesCount(intervals);
+		int score = seq_len-1 - c + t;
+		//System.out.println(seq_len + "-" + c + "-" + t);
+		return score;
 	}
 
 	// separate into unsigned elements and their signs
@@ -489,7 +489,6 @@ public class P2 {
 	private int findCyclesCount(Node[][] intervals) {
 		int colLen = intervals[0].length;
 		int count = 0;
-		Node start = null;
 		Node curr = null;
 		
 		for(int i=0; i<colLen; i++) {
