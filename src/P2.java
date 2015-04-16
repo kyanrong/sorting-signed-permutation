@@ -11,12 +11,10 @@ import java.util.Stack;
 public class P2 {
 	int seq_len;
 	ArrayList<PermutationPair> permutations;			// all the permutations in the file
-	ArrayList<ComponentPair> componentPairs;
-	ArrayList<Tree> subtrees;
-	ArrayList<int[][]> intervals;
 	int[][] dist;			
 	Mapper mapper;
-
+	ArrayList<String> speciesNames;
+	
 	public P2() throws IOException {
 		System.out.println("********************* P2 *********************");
 		System.out.println("Please input file path: ");
@@ -41,6 +39,7 @@ public class P2 {
 			}
 		}	
 		
+		// printing distance matrix
 		for(int i=0; i<permutations.size(); i++) {
 			System.out.print(permutations.get(i).getName() + ": ");
 			for(int j=0; j<permutations.size(); j++) {
@@ -51,30 +50,17 @@ public class P2 {
 	}
 	
 	private void getInput() throws IOException {
-		Scanner sc = new Scanner(System.in);
-		//String path = sc.nextLine();
 		String path = "datasets/eg2.txt";
+		SeqParser sp = new SeqParser(path);
+		SeqExtractor se = new SeqExtractor(sp.getSequence());
+		speciesNames = sp.getSpecies();
 		
-		
-		FileReader fr = new FileReader(new File(path));
-		BufferedReader br = new BufferedReader(fr);
-		
-		String line;
-		String name = null;
-		while((line=br.readLine())!= null) {
-			if(line.startsWith(">")) {
-				name = line.split("> ")[1];
-			}
-			else {
-				String[] seq = line.split(", ");
-				seq_len = seq.length+2;				// +2 to add 0 and n+1 to the seq
-				PermutationPair pp = separate(seq, name);
-				permutations.add(pp);
-			}
+		for(int i=0; i<speciesNames.size(); i++) {
+			ArrayList<Integer> pi = se.getUnsigned().get(i);
+			ArrayList<Boolean> sigma = se.getSign().get(i);
+			seq_len = pi.size();
+			permutations.add(new PermutationPair(pi, sigma, speciesNames.get(i)));
 		}
-		
-		br.close();
-		sc.close();
 	}
 	
 	// d(P) = n - c + t
@@ -87,30 +73,6 @@ public class P2 {
 		int score = seq_len-1 - c + t;
 		//System.out.println(seq_len + "-" + c + "-" + t);
 		return score;
-	}
-
-	// separate into unsigned elements and their signs
-	private PermutationPair separate(String[] seq, String name) {
-		ArrayList<Integer> pi = new ArrayList<Integer>();
-		ArrayList<Boolean> sigma = new ArrayList<Boolean>();
-		
-		pi.add(0); sigma.add(true);
-		
-		for(int i=0; i<seq.length; i++) {
-			int num = Integer.parseInt(seq[i]);
-			if(num > 0) {
-				pi.add(num);					
-				sigma.add(true);
-			}
-			else {
-				pi.add(num*-1);
-				sigma.add(false);
-			}
-		}
-				
-		pi.add(seq_len-1); sigma.add(true);
-		
-		return new PermutationPair(pi, sigma, name);
 	}
 	
 	// pi contains the unsigned elements
@@ -467,20 +429,6 @@ public class P2 {
 			n2.setRowSibling(n1);
 			
 		}
-		
-		
-		/*for(int i=0;i<2;i++) {
-			for(int j=0;j<pi.size()-1;j++) {
-				if(intervals[i][j] == null) {
-					System.out.print("0, ");
-				}
-				else{
-					System.out.print("1, ");
-				}
-			}
-			System.out.println();
-		}
-		System.out.println();*/
 		
 		return intervals;
 	}
