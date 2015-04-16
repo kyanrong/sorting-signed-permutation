@@ -2,6 +2,7 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
+
 class P3{
 	public static ArrayList<ArrayList<Integer>> matrix = new ArrayList<ArrayList<Integer>>();  //store the distance matrix
 	public static ArrayList<IntegerPair> min = new ArrayList<IntegerPair>();   //store the index of minimum distance for each row in the matrix
@@ -10,16 +11,21 @@ class P3{
 	public static ArrayList<cluster> clusters = new ArrayList<cluster>();
 	public static int numNodes;
 	
-	public static void main (String[] args){
+	public P3() throws IOException{
 		
 		Scanner sc = new Scanner(System.in);
 		
 		//GET THE INPUT
 		try{
-			getInput();
-		}catch(IOException e){
+			P2NoPrint p2 = new P2NoPrint();
+			
+		
 
-		}
+		int[][] dist = p2.getMatrix();
+
+		ArrayList<String> names = p2.getNames();
+
+		process(dist,names);
 		
 		CNode root= new CNode();
 	
@@ -54,12 +60,16 @@ class P3{
 		
 		//PRINTING THE TREE START FROM ROOT
 		printBinaryTree(root,0);
+	}catch(IOException e){
+
+		}
 
 	}
 
 	
 	//CODE WITH REFERENCE FROM: http://stackoverflow.com/questions/4965335/how-to-print-binary-tree-diagram
 	public static void printBinaryTree(CNode root,int level){
+   		
    		if(root==null)
         	return;
     	printBinaryTree(root.getChildR(),level+1);
@@ -74,67 +84,40 @@ class P3{
     	printBinaryTree(root.getChildL(),level+1);
 }
 
+private static void process(int[][] dist, ArrayList<String> names){
+	int minRow = 10000;
+	int rowIndex = 0;
+	int colIndex = 0;
+	numNodes = names.size();
+	int num=0;
 
-	private static void getInput() throws IOException {
-		Scanner sc = new Scanner(System.in);
-		String path = sc.nextLine();
-		//String path = "datasets/viral_genome.txt";
-		;
-		
-		FileReader fr = new FileReader(new File(path));
-		BufferedReader br = new BufferedReader(fr);
-		
-		String line;
-		String name = null;
-		int num = 0;
-		int minRow = 10000;
-		int rowIndex = 0;
-		int colIndex = 0;
-		int count = 0;
-		while((line=br.readLine())!= null) {
-			String[] scores = line.split("\\s+");
-			name = scores[0].substring(0,scores[0].length()-1);
-			
-			SpeciesA.put(name,count);
-			SpeciesB.put(count,name);
-
-
-			CNode newNode = new CNode(null,"leaf",name);
-			ArrayList<String> dummy = new ArrayList<String>();
-			cluster clusterNew = new cluster(count,dummy,newNode);
-			clusters.add(clusterNew);
-			ArrayList<Integer> row = new ArrayList<Integer>();
-			minRow=10000000;
-
-			for(int x=1;x<scores.length;x++){
-				String temp = scores[x].trim();
-				 
-				 if(x!=scores.length-1){
-				 temp = temp.substring(0,scores[x].length()-1);
-				 }
-				num = Integer.parseInt(temp);
-				System.out.println("num is " +num);
-				if(num < minRow && count!=x-1){
-					minRow = num;
-					rowIndex=count;
-					colIndex=x-1;
-				}
-				row.add(num);	
-
+	for(int i=0;i<names.size();i++){
+		SpeciesA.put(names.get(i),i);
+		SpeciesB.put(i,names.get(i));
+		CNode newNode = new CNode(null,"leaf",names.get(i));
+		ArrayList<String> dummy = new ArrayList<String>();
+		cluster clusterNew = new cluster(i,dummy,newNode);
+		clusters.add(clusterNew);
+		ArrayList<Integer> row = new ArrayList<Integer>();
+		minRow=10000;
+		for(int j=0;j<names.size();j++){
+			num = dist[i][j];
+			if(num < minRow && i!=j){
+				minRow = num;
+				rowIndex=i;
+				colIndex=j;
 			}
-
+			row.add(num);
+		}
 		IntegerPair values = new IntegerPair(rowIndex,colIndex,minRow);
 		boolean check = min.add(values);
-		matrix.add(row);		
-		count++;		
-			
-		}
-		numNodes = count;
-		
-		br.close();
-		sc.close();
-	}
+		matrix.add(row);			
 
+	}
+}
+
+
+	
 
 
 	//Method to obtain input
@@ -425,4 +408,5 @@ class P3{
 	}
 
 }
+
 

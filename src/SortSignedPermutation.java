@@ -20,6 +20,7 @@ public class SortSignedPermutation {
 					break;
 			// file input
 			case 3: 
+				P3 p3 = new P3();
 					break;
 			
 		}

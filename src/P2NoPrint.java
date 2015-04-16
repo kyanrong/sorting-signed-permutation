@@ -8,14 +8,14 @@ import java.util.Scanner;
 import java.util.Stack;
 
 
-public class P2 {
+public class P2NoPrint {
 	int seq_len;
-	ArrayList<PermutationPair> permutations;			// all the permutations in the file
-	int[][] dist;			
+	static ArrayList<PermutationPair> permutations;			// all the permutations in the file
+	static int[][] dist;			
 	Mapper mapper;
 	ArrayList<String> speciesNames;
 	
-	public P2() throws IOException {
+	public P2NoPrint() throws IOException {
 		System.out.println("********************* P2 *********************");
 		System.out.println("Please input file path: ");
 		
@@ -39,23 +39,32 @@ public class P2 {
 			}
 		}	
 		
-		// printing distance matrix
-		for(int i=0; i<permutations.size(); i++) {
-			System.out.print(permutations.get(i).getName() + ": ");
-			for(int j=0; j<permutations.size(); j++) {
-				System.out.print(dist[i][j] + ", ");
-			}
-			System.out.println();
-		}
+		
 	}
 	
+	public static int[][] getMatrix(){
+		return dist;
+	}
+
+	public static ArrayList<String> getNames(){
+		ArrayList<String> name = new ArrayList<String>();
+		for(int i=0;i<permutations.size();i++){
+			name.add(permutations.get(i).getName());
+		}
+		return name;
+	}
+
 	private void getInput() throws IOException {
-		String path = "eg2.txt";
+		String path = "viral_genome.txt";
+		
 		SeqParser sp = new SeqParser(path);
+		
 		SeqExtractor se = new SeqExtractor(sp.getSequence());
+		
 		speciesNames = sp.getSpecies();
 		
 		for(int i=0; i<speciesNames.size(); i++) {
+
 			ArrayList<Integer> pi = se.getUnsigned().get(i);
 			ArrayList<Boolean> sigma = se.getSign().get(i);
 			seq_len = pi.size();
