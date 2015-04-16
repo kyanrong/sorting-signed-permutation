@@ -247,7 +247,7 @@ private static void process(int[][] dist, ArrayList<String> names){
 					}
 					//sum = sum * (1/(children.size() * child.size()));
 					double tempSum = (double) 1/(children.size() *child.size());
-					tempSum = Math.floor(sum * tempSum);
+					tempSum = Math.ceil(sum * tempSum);
 					sum =(int) tempSum;
 
 				//case 2: the cluster is a single node
