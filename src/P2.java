@@ -12,6 +12,8 @@ public class P2 {
 	int seq_len;
 	ArrayList<PermutationPair> permutations;			// all the permutations in the file
 	ArrayList<ComponentPair> componentPairs;
+	ArrayList<Tree> subtrees;
+	ArrayList<int[][]> intervals;
 	int[][] dist;			
 
 	public P2() throws IOException {
@@ -20,17 +22,21 @@ public class P2 {
 		
 		permutations = new ArrayList<PermutationPair>();
 		componentPairs = new ArrayList<ComponentPair>();
+		subtrees = new ArrayList<Tree>();
+		intervals = new ArrayList<int[][]>();
 
 		getInput();
 		//dist = new int[permutations.size()][permutations.size()];
 		getComponents();
-		getTrees();
+		getSubtrees();
+		getCoverCosts();
+		getIntervals();
 	}
 	
 	private void getInput() throws IOException {
 		Scanner sc = new Scanner(System.in);
 		//String path = sc.nextLine();
-		String path = "datasets/viral_genome.txt";
+		String path = "datasets/eg2.txt";
 		
 		
 		FileReader fr = new FileReader(new File(path));
@@ -61,12 +67,28 @@ public class P2 {
 		}
 	}
 	
-	private void getTrees() {
+	private void getSubtrees() {
 		for(int i=0; i<componentPairs.size(); i++) {
-			constructTree(componentPairs.get(i), seq_len);
+			Tree t = constructTree(componentPairs.get(i), seq_len);
+			subtrees.add(t);
 		}
 	}
 	
+	private void getCoverCosts() {
+		for(int i=0; i<permutations.size(); i++) {
+			int cost = findCoverCost(subtrees.get(i));
+			//System.out.println("Cover cost = " + cost);
+		}
+	}
+	
+	private void getIntervals() {
+		for(int i=0; i<permutations.size(); i++) {
+			Node[][] intervals = findIntervals(permutations.get(i));
+			int count = findCyclesCount(intervals);
+			System.out.println("Cycles count = " + count);
+		}
+	}
+
 	// separate into unsigned elements and their signs
 	private PermutationPair separate(String[] seq, String name) {
 		ArrayList<Integer> pi = new ArrayList<Integer>();
@@ -204,7 +226,7 @@ public class P2 {
 		return pair;
 	}
 	
-	private Node constructTree(ComponentPair pair, int n) {
+	private Tree constructTree(ComponentPair pair, int n) {
 		ArrayList<Component> c_s = pair.getCStart();
 		ArrayList<Component> c_e = pair.getCEnd();
 		
@@ -237,24 +259,25 @@ public class P2 {
 		//System.out.println("Tree size = " + tree.getTreeSize());
 		//tree.printTree(root);
 		
-		Node subtreeRoot = generateSubtree(tree);
-		return subtreeRoot;
+		Tree subtree = generateSubtree(tree);
+		return subtree;
 	}
 	
 	
 	// Generate T': the smallest subtree of T that contains all unoriented components of P
 	// obtained by recursively removing from T all dangling oriented components and square nodes (post-order traversal)
 	// All leaves of T' will be unoriented components, while internal round nodes may still represent oriented components
-	private Node generateSubtree(Tree t) {
+	private Tree generateSubtree(Tree t) {
 		//System.out.println("Generating subtree ...");
 		Node root = t.getRoot();
-		boolean result = remove(root);
+		remove(root);
 		Tree subtree = new Tree(root);
-
+		//cleanup(root);
+		
 		//System.out.println("Subtree size = " + subtree.getTreeSize());
 		//subtree.printTree(root);
 		
-		return root;		
+		return subtree;		
 	}
 	
 	private boolean remove(Node n) {
@@ -267,7 +290,7 @@ public class P2 {
 				System.out.println("	" + n.getChildren().get(i).getComponent().getStart() + "," + n.getChildren().get(i).getComponent().getEnd());
 			}
 		}*/
-		for(int i=0; i<n.getChildrenSize(); i++) {
+		for(int i=n.getChildrenSize()-1; i>=0; i--) {
 			/*if(n.getChildren().get(i).getComponent() == null) {
 				System.out.println("Calling remove on square");
 			}
@@ -290,13 +313,13 @@ public class P2 {
 			if(n.getType().equals("square") || n.getComponent().getOrientation()==true) {
 				return false;
 			}
+			else {
+				return true;
+			}
 		}
-		else {
-			return true;
-		}
-		
 		return true;
 	}
+	
 	
 	// Find out if a component is oriented
 	// unoriented component: has one or more breakpoints, and (p,q) have the same sign
@@ -328,6 +351,169 @@ public class P2 {
 			}
 		}
 		return false;
+	}
+	
+	// Calculated using Theorem 3, page 395 of the paper
+	private int findCoverCost(Tree tree) {
+		int leavesCount = tree.getLeavesCount();
+
+		if(leavesCount == 0) {
+			return 0;
+		}
+		
+		if(!tree.hasShortBranch()) {
+			return leavesCount+1;
+		}
+		else {
+			return leavesCount;
+		}
+	}
+	
+	// right point of k if k is +ve, otherwise its left point
+	// left point of k+1 if k+1 is +ve, else its right point
+	private Node[][] findIntervals(PermutationPair pp) {
+		ArrayList<Integer> pi = pp.getPiArr();
+		ArrayList<Boolean> sigma = pp.getSigmaArr();
+		Node[][] intervals = new Node[2][pi.size()-1];
+		Node n1, n2;
+		
+		// for checking
+		/*int[][] arr = new int[pi.size()-1][pi.size()-1]; 
+		for(int i=0; i<pi.size()-1; i++) {
+			int idx1 = pi.indexOf(i);
+			int idx2 = pi.indexOf(i+1);
+				
+			if(sigma.get(idx1)) {
+				arr[i][idx1] = 1;
+			}
+			else {
+				arr[i][idx1-1] = 1;
+			}
+				
+			if(sigma.get(idx2)) {
+				arr[i][idx2-1] = 1;
+			}
+			else {
+				arr[i][idx2] = 1;
+			}
+		}
+		
+			for(int i=0; i<pi.size()-1; i++) {
+				for(int j=0; j<pi.size()-1; j++) {
+					System.out.print(arr[i][j] + ", ");
+				}
+				System.out.println();
+			}
+			System.out.println();*/
+		// end checking
+		
+		for(int i=0; i<pi.size()-1; i++) {
+			int idx1 = pi.indexOf(i);
+			int idx2 = pi.indexOf(i+1);
+			
+			// idx1
+			if(sigma.get(idx1)) {
+				if(intervals[0][idx1] == null) {
+					intervals[0][idx1] = new Node();
+					n1 = intervals[0][idx1];
+				}
+				else {
+					intervals[1][idx1] = new Node();
+					intervals[1][idx1].setColSibling(intervals[0][idx1]);
+					intervals[0][idx1].setColSibling(intervals[1][idx1]);
+					n1 = intervals[1][idx1];
+				}
+			}
+			else {
+				if(intervals[0][idx1-1] == null) {
+					intervals[0][idx1-1] = new Node();
+					n1 = intervals[0][idx1-1];
+				}
+				else {
+					intervals[1][idx1-1] = new Node();
+					intervals[1][idx1-1].setColSibling(intervals[0][idx1-1]);
+					intervals[0][idx1-1].setColSibling(intervals[1][idx1-1]);
+					n1 = intervals[1][idx1-1];
+				}
+			}
+			
+			// idx2
+			if(sigma.get(idx2)) {
+				if(intervals[0][idx2-1] == null) {
+					intervals[0][idx2-1] = new Node();
+					n2 = intervals[0][idx2-1];
+				}
+				else {
+					intervals[1][idx2-1] = new Node();
+					intervals[1][idx2-1].setColSibling(intervals[0][idx2-1]);
+					intervals[0][idx2-1].setColSibling(intervals[1][idx2-1]);
+					n2 = intervals[1][idx2-1];
+				}
+			}
+			else {
+				if(intervals[0][idx2] == null) {
+					intervals[0][idx2] = new Node();
+					n2 = intervals[0][idx2];
+				}
+				else {
+					intervals[1][idx2] = new Node();
+					intervals[1][idx2].setColSibling(intervals[0][idx2]);
+					intervals[0][idx2].setColSibling(intervals[1][idx2]);
+					n2 = intervals[1][idx2];
+				}
+			}
+			
+			n1.setRowSibling(n2);
+			n2.setRowSibling(n1);
+			
+		}
+		
+		
+		/*for(int i=0;i<2;i++) {
+			for(int j=0;j<pi.size()-1;j++) {
+				if(intervals[i][j] == null) {
+					System.out.print("0, ");
+				}
+				else{
+					System.out.print("1, ");
+				}
+			}
+			System.out.println();
+		}
+		System.out.println();*/
+		
+		return intervals;
+	}
+
+	
+	private int findCyclesCount(Node[][] intervals) {
+		int colLen = intervals[0].length;
+		int count = 0;
+		Node start = null;
+		Node curr = null;
+		
+		for(int i=0; i<colLen; i++) {
+			if(!intervals[0][i].getVisited()) {
+				curr = intervals[0][i];
+				curr.setVisited(true);
+					
+				// while not completed a cycle
+				while(!curr.getRowSibling().getVisited() || !curr.getColSibling().getVisited()) {
+					if(!curr.getRowSibling().getVisited()) {
+						curr.setVisited(true);
+						curr = curr.getRowSibling();
+					}
+					else {
+						curr.setVisited(true);
+						curr = curr.getColSibling();
+					}
+				}
+				curr.setVisited(true);
+				count++;	
+			}
+		}
+		return count;
+		
 	}
 }
 	

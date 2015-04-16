@@ -9,6 +9,10 @@ public class Node {
 	private ArrayList<Node> children;
 	private boolean visited;
 	
+	// for finding cycles 
+	private Node rowSibling;
+	private Node colSibling;
+	
 	public Node(String t, Component c) {
 		type = t;
 		this.c = c;
@@ -22,6 +26,12 @@ public class Node {
 		c = null;
 		parent = null;
 		children = new ArrayList<Node>();
+		visited = false;
+	}
+	
+	public Node() {
+		rowSibling = null;
+		colSibling = null;
 		visited = false;
 	}
 	
@@ -76,5 +86,27 @@ public class Node {
 		degree += getChildrenSize();
 		
 		return degree;
+	}
+	
+	// for finding cycles
+	public Node getRowSibling() {
+		return rowSibling;
+	}
+	
+	public Node getColSibling() {
+		return colSibling;
+	}
+	
+	public void setRowSibling(Node rs) {
+		/*if(rs.equals(colSibling)) {
+			rowSibling = null;
+		}
+		else {*/
+			rowSibling = rs;
+		//}
+	}
+	
+	public void setColSibling(Node cs) {
+		colSibling = cs;
 	}
 }
