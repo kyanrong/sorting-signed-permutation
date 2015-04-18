@@ -3,16 +3,16 @@ class IntegerPair{
 	private  int B;
 	private String nameA;
 	private String nameB;
-	private int distance;
+	private double distance;
 
 
-	public IntegerPair(int a, int b,int value){
+	public IntegerPair(int a, int b,double value){
 		A = a;
 		B = b;
 		distance = value;
 	}
 
-	public IntegerPair(int a, int b,int value,String nameX,String nameY){
+	public IntegerPair(int a, int b,double value,String nameX,String nameY){
 		A = a;
 		B = b;
 		distance = value;
@@ -29,7 +29,7 @@ class IntegerPair{
 		return B;
 	}
 
-	public  int getDistance(){
+	public  double getDistance(){
 		return distance;
 	}
 

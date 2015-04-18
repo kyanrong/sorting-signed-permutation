@@ -8,8 +8,8 @@ class CNode{
 	private CNode parent;
 	private String type;
 	private String index;
-	private int distance;
-	private int totalDistance;
+	private double distance;
+	
 
 	public CNode( CNode parent,String nodeType,String indexNode){
 		childLeft = null;
@@ -18,7 +18,7 @@ class CNode{
 		type = nodeType;
 		index = indexNode;
 		distance = 0; //this refers to the distance from a child node to its parent node
-		totalDistance = 0; //this refers to the total distance from the leaf node to the current node
+		
 	}
 	public CNode(){
 
@@ -36,21 +36,16 @@ class CNode{
 		return childRight;
 	}
 
-	public void addDistance(int dist){
+	public void addDistance(double dist){
 		distance=dist;
 	}
 
-	public void addTotalDistance(int dist){
-		totalDistance=dist;
-	}
+	
 
-	public int getDistance(){
+	public double getDistance(){
 		return distance;
 	}
-	public int getTotalDistance(){
-		return totalDistance;
-	}
-
+	
 	public CNode getParent(){
 		return parent;
 	}
