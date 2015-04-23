@@ -16,16 +16,41 @@ public class P1 {
 		permutations = new ArrayList<PermutationPair>(); 
 
 		getInput();
-
+		
+		ArrayList<Boolean> sign = new ArrayList <Boolean>();
+		for (int j = 0; j <= permutations.get(0).getSigmaArr().size()-1; j++){
+			sign.add(permutations.get(0).getSigmaArr().get(j));
+		}
+		String signA;
+		for (int y = 1; y<= permutations.get(0).getSigmaArr().size()-2; y++){
+			if (permutations.get(0).getSigmaArr().get(y) == true){
+				 signA = "";
+			}else{
+				signA = "-";
+			}
+			String value = signA + permutations.get(0).getPiArr().get(y).toString();
+			System.out.print(value);
+			if (y!=permutations.get(0).getSigmaArr().size()-2){
+				System.out.print(", ");
+			}
+		}
+		System.out.println();
+		
+		
+		
 		p1 = findComponents(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr());
 		//p2 = findComponents(permutations.get(1).getPiArr(), permutations.get(1).getSigmaArr());
-		
+		/*Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr(), permutations.get(1).getPiArr(), permutations.get(1).getSigmaArr());
+		*/
+
 		Tree subtree = constructTree(p1, seq_len);
 		Node subtreeRoot = subtree.getRoot();
 		ArrayList<Path> cover = findCover(subtreeRoot);
-		orientComponents(cover, permutations.get(0));
-		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr(), permutations.get(1).getPiArr(), permutations.get(1).getSigmaArr());
 		findCoverCost(subtree);
+		orientComponents(cover, permutations.get(0));
+		
+		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr(), permutations.get(1).getPiArr(), permutations.get(1).getSigmaArr());
+		
 		//constructTree(p2, seq_len);
 		
 	}
@@ -320,20 +345,18 @@ public class P1 {
 		ArrayList<Component> list = new ArrayList<Component>();
 
 		list = visit(n, cover, list);
-		if(list.size()!=0) {
-			cover.add(new Path(list.get(0)));
+		if (list.size()!= 0){
+		cover.add(new Path(list.get(0)));
 		}
-		
-
-		System.out.println("Cover size = " + cover.size());
-		/*for(int i=0; i<cover.size(); i++) {
-			if(cover.get(i).getEndComponent() != null) {
+		/*System.out.println("Cover size = " + cover.size());*/
+		for(int i=0; i<cover.size(); i++) {
+			/*if(cover.get(i).getEndComponent() != null) {
 				System.out.println("	" + cover.get(i).getStartComponent().getStart() + "," + cover.get(i).getStartComponent().getEnd() + " to " + cover.get(i).getEndComponent().getStart() + "," + cover.get(i).getEndComponent().getEnd() );
-			}
-			else {
+			}*/
+			/*else {
 				System.out.println("	" + cover.get(i).getStartComponent().getStart()+","+cover.get(i).getStartComponent().getEnd());
-			}
-		}*/
+			}*/
+		}	
 
 		return cover;
 	}
@@ -361,7 +384,7 @@ public class P1 {
 	private void orientComponents(ArrayList<Path> cover, PermutationPair pp) {
 		for(int i=0; i<cover.size(); i++) {
 			if(cover.get(i).getSize() == 1) {
-				if(cover.get(i).getStartComponent() == null) {
+				if (cover.get(i).getStartComponent() == null){
 					return;
 				}
 				cut(cover.get(i).getStartComponent(), pp);
@@ -369,12 +392,34 @@ public class P1 {
 			else {
 				merge(cover.get(i).getStartComponent(), cover.get(i).getEndComponent(), pp);
 			}
+			
+			ArrayList<Boolean> sign = new ArrayList <Boolean>();
+			for (int j = 0; j <= pp.sigma.size()-1; j++){
+				sign.add(pp.sigma.get(j));
+			}
+			String signA;
+			for (int y = 1; y<= pp.sigma.size()-2; y++){
+				if (pp.sigma.get(y) == true){
+					 signA = "";
+				}else{
+					signA = "-";
+				}
+				String value = signA + pp.pi.get(y).toString();
+				System.out.print(value);
+				if (y!=pp.sigma.size()-2){
+					System.out.print(", ");
+				}
+			}
+			System.out.println();
 		}
 	}
 
 	private void cut(Component c, PermutationPair pp) {
+		
 		int startidx = c.getStart();
 		int endidx = c.getEnd();
+		
+		
 		ArrayList<Integer> pi = pp.getPiArr();
 		ArrayList<Boolean> sigma = pp.getSigmaArr();
 
@@ -383,6 +428,7 @@ public class P1 {
 			sigma.set(i, !sigma.get(i));
 		}
 		Collections.reverse(sigma.subList(startidx, endidx+1));
+		
 	}
 
 	// c1 and c2 are in order, so c1's startidx will always be smallest
@@ -398,7 +444,7 @@ public class P1 {
 			sigma.set(i,  !sigma.get(i));
 		}
 		Collections.reverse(sigma.subList(startidx, endidx+1));
-
+		
 	}
 
 	// Calculated using Theorem 3, page 395 of the paper
@@ -415,7 +461,6 @@ public class P1 {
 
 	private static int score (PermutationPair pair){
 		int count = 0;
-		ArrayList<Boolean> sign = new ArrayList<Boolean>();
 		ArrayList<Integer>pi = pair.getPiArr();
 		ArrayList<Boolean>sigma = pair.getSigmaArr();
 
@@ -435,7 +480,6 @@ public class P1 {
 		ArrayList<Boolean> sign = new ArrayList<Boolean>();
 		String name = null;
 		//The given sequence
-		PermutationPair seq = new PermutationPair (pi, sigma, name);
 		ArrayList<Integer> ppi = new ArrayList<Integer>();
 		ArrayList<Boolean> sig = new ArrayList<Boolean>();
 		for (int i = 0; i<pi.size(); i++){
@@ -450,12 +494,12 @@ public class P1 {
 		int l = -1; int s = 0;
 		//do while loop the pi is not the identity sequence
 
-		int count =0;
+	
 
 		for (int j = 0; j <= sigma.size()-1; j++){
 			sign.add(sigma.get(j));
 		}
-		String signA;
+/*		String signA;
 		for (int y = 1; y<= sigma.size()-2; y++){
 			if (sigma.get(y) == true){
 				 signA = "";
@@ -468,7 +512,7 @@ public class P1 {
 				System.out.print(", ");
 			}
 		}
-		System.out.println();
+		System.out.println();*/
 		
 		Mapper mapper = new Mapper (pi, piB, sigma, sigmaB);
 
@@ -533,7 +577,6 @@ public class P1 {
 	}
 
 	private static PermutationPair reversal(int index, ArrayList<Integer> pi, ArrayList<Boolean> sign) {
-		String name = null;
 
 		int i = pi.get(index);
 		int iPlus = i+1;
