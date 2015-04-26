@@ -397,7 +397,7 @@ public class P1 {
 			}
 			
 			
-			ArrayList<Boolean> sign = new ArrayList <Boolean>();
+			/*ArrayList<Boolean> sign = new ArrayList <Boolean>();
 			for (int j = 0; j <= pp.sigma.size()-1; j++){
 				sign.add(pp.sigma.get(j));
 			}
@@ -414,17 +414,17 @@ public class P1 {
 					System.out.print(", ");
 				}
 			}
-			System.out.println();
+			System.out.println();*/
 			
 			/*Mapper mapper = new Mapper (pp.pi, ppB.pi, pp.sigma, ppB.sigma);*/
-			/*ArrayList<Integer> tempPermut = mapper.getCurrentReversal(pp.getPiArr(), pp.getSigmaArr());
+			ArrayList<Integer> tempPermut = mapper.getCurrentReversal(pp.getPiArr(), pp.getSigmaArr());
 			for (int z=1; z<=pp.getPiArr().size()-2; z++){
 				System.out.print(tempPermut.get(z));
 				if(z!=pp.getPiArr().size()-2){
 					System.out.print(", ");
 				}
 			}
-			System.out.println();*/
+			System.out.println();
 		}
 	}
 
