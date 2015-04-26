@@ -47,7 +47,7 @@ public class P1 {
 		Node subtreeRoot = subtree.getRoot();
 		ArrayList<Path> cover = findCover(subtreeRoot);
 		findCoverCost(subtree);
-		orientComponents(cover, permutations.get(0));
+		orientComponents(cover, permutations.get(0), permutations.get(1));
 		
 		Bergerone(permutations.get(0).getPiArr(), permutations.get(0).getSigmaArr(), permutations.get(1).getPiArr(), permutations.get(1).getSigmaArr());
 		
@@ -381,7 +381,7 @@ public class P1 {
 
 
 	// apply merge/cut on the cover to orient all components
-	private void orientComponents(ArrayList<Path> cover, PermutationPair pp) {
+	private void orientComponents(ArrayList<Path> cover, PermutationPair pp, PermutationPair ppB) {
 		for(int i=0; i<cover.size(); i++) {
 			if(cover.get(i).getSize() == 1) {
 				if (cover.get(i).getStartComponent() == null){
@@ -393,7 +393,8 @@ public class P1 {
 				merge(cover.get(i).getStartComponent(), cover.get(i).getEndComponent(), pp);
 			}
 			
-			ArrayList<Boolean> sign = new ArrayList <Boolean>();
+			
+			/*ArrayList<Boolean> sign = new ArrayList <Boolean>();
 			for (int j = 0; j <= pp.sigma.size()-1; j++){
 				sign.add(pp.sigma.get(j));
 			}
@@ -407,6 +408,16 @@ public class P1 {
 				String value = signA + pp.pi.get(y).toString();
 				System.out.print(value);
 				if (y!=pp.sigma.size()-2){
+					System.out.print(", ");
+				}
+			}
+			System.out.println();*/
+			
+			Mapper mapper = new Mapper (pp.pi, ppB.pi, pp.sigma, ppB.sigma);
+			ArrayList<Integer> tempPermut = mapper.getCurrentReversal(pp.getPiArr(), pp.getSigmaArr());
+			for (int z=1; z<=pp.getPiArr().size()-2; z++){
+				System.out.print(tempPermut.get(z));
+				if(z!=pp.getPiArr().size()-2){
 					System.out.print(", ");
 				}
 			}
